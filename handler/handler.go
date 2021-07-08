@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Upload(rec *face.Recognizer) echo.HandlerFunc {
+func Register(rec *face.Recognizer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		start := time.Now()
 

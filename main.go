@@ -22,7 +22,7 @@ func main() {
 
 	e := echo.New()
 	
-	e.POST("/upload", handler.Upload(rec))
+	e.POST("/register", handler.Register(rec))
 	e.POST("/find", handler.Find(rec))
 
 	e.Logger.Fatal(e.Start(":8081"))
