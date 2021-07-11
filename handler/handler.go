@@ -53,6 +53,8 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 
 		log.Println("File " + filename + " uploaded")
 
+		log.Println("File " + filename + " uploaded")
+
 		elapsed := time.Since(start)
 		return c.JSON(http.StatusOK, map[string]string{
 			"status":        "success",
