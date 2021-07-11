@@ -19,7 +19,6 @@ var (
 	EncodedDir = filepath.Join(DataDir, "encoded")
 )
 
-
 func contains(slice []string, str string) bool {
 	for _, value := range slice {
 		if value == str {
@@ -29,24 +28,24 @@ func contains(slice []string, str string) bool {
 	return false
 }
 
+// 			encodedFile := filepath.Join(encFolder, file)
+// 			_, err := os.Stat(encodedFile)
+// 			if os.IsNotExist(err) {
+// 				knownFace, _ := rec.RecognizeSingleFile(filepath.Join(dir, file))
+// 				DumpToJson(encFolder, file, knownFace.Descriptor)
+// 			}
+
 func GetSamplesCatsLabels(rec *face.Recognizer, excludes []string) (samples []face.Descriptor, cats []int32, labels []string) {
 	dirs, _ := OSReadDir(EncodedDir, ".jpg")
-	for _, dir := range dirs{
+	for _, dir := range dirs {
 		encFolder := filepath.Join(EncodedDir, dir)
 		_, files := OSReadDir(encFolder, ".jpg")
 		for i, file := range files {
-			// label := strings.Split(file, ".")[0]
 			label := dir
 			if contains(excludes, label) {
 				continue
 			}
-			encodedFile := filepath.Join(encFolder, file)
-			_, err := os.Stat(encodedFile)
-			if os.IsNotExist(err) {
-				knownFace, _ := rec.RecognizeSingleFile(filepath.Join(dir, file))
-				DumpToJson(encFolder, file, knownFace.Descriptor)
-			}
-	
+
 			descriptor := DecodeFromJson(encFolder, file)
 			samples = append(samples, descriptor)
 			cats = append(cats, int32(i))
@@ -64,9 +63,7 @@ func SaveFile(dir string, filename string, content multipart.File) {
 	io.Copy(destination, content)
 }
 
-func OSReadDir(root string, extension string) ([]string ,[]string ){
-	var files []string
-	var dirs []string
+func OSReadDir(root string, extension string) (dirs []string, files []string) {
 	f, _ := os.Open(root)
 	defer f.Close()
 
@@ -80,7 +77,7 @@ func OSReadDir(root string, extension string) ([]string ,[]string ){
 			dirs = append(dirs, file.Name())
 		}
 	}
-	return dirs, files
+	return
 }
 
 func DumpToJson(dir string, filename string, object face.Descriptor) {
@@ -88,18 +85,17 @@ func DumpToJson(dir string, filename string, object face.Descriptor) {
 	file, _ := os.Create(filepath.Join(dir, filename))
 	defer file.Close()
 
-	enc := json.NewEncoder(file)
-	enc.Encode(object)
+	encoder := json.NewEncoder(file)
+	encoder.Encode(object)
 
 }
 
-func DecodeFromJson(dir string, filename string) face.Descriptor {
+func DecodeFromJson(dir string, filename string) (descriptor face.Descriptor) {
 	file, _ := os.Open(filepath.Join(dir, filename))
 	defer file.Close()
 
-	dec := json.NewDecoder(file)
-	var descriptor face.Descriptor
-	dec.Decode(&descriptor)
+	decoder := json.NewDecoder(file)
+	decoder.Decode(&descriptor)
 
 	return descriptor
 }

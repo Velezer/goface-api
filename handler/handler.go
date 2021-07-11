@@ -25,7 +25,7 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 			})
 		}
 		filename := time.Now().Local().String() + ".jpg"
-		filename = strings.Replace(filename,":", "", -1)
+		filename = strings.Replace(filename, ":", "", -1)
 
 		file, _ := c.FormFile("file") //name=file in client html form
 		content, _ := file.Open()
@@ -53,12 +53,10 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 
 		log.Println("File " + filename + " uploaded")
 
-		log.Println("File " + filename + " uploaded")
-
 		elapsed := time.Since(start)
 		return c.JSON(http.StatusOK, map[string]string{
 			"status":        "success",
-			"message":       "Database wajah "+name+" ditambahkan",
+			"message":       "Database wajah " + name + " ditambahkan",
 			"response_time": elapsed.String(),
 		})
 	}
@@ -72,9 +70,15 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		excludes := formParams["excludes"]
 
 		samples, cats, labels := helper.GetSamplesCatsLabels(rec, excludes)
+		if len(samples) == 0 {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"status":  "fail",
+				"message": "Sampel wajah kosong",
+			})
+		}
 		rec.SetSamples(samples, cats)
 
-		log.Println(labels)
+		log.Println(len(samples))
 
 		file, err := c.FormFile("file") //name=file in client html form
 		if err != nil {
@@ -98,16 +102,16 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		if len(unknownFaces) > 1 {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status":  "fail",
-				"message": "Detected more than one faces",
+				"message": "Terdeteksi lebih dari satu wajah",
 			})
 		}
 		if len(unknownFaces) < 1 {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status":  "fail",
-				"message": "No face detected",
+				"message": "Wajah tidak terdeteksi",
 			})
 		}
-		catID := rec.ClassifyThreshold(unknownFaces[0].Descriptor, 0.39)
+		catID := rec.ClassifyThreshold(unknownFaces[0].Descriptor, 0.4)
 
 		var detected string
 		if catID < 0 {
@@ -115,7 +119,7 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		} else {
 			detected = labels[catID]
 		}
-		
+
 		elapsed := time.Since(start)
 		log.Println("Detected:", detected, "in", elapsed.String())
 		return c.JSON(http.StatusOK, map[string]interface{}{
