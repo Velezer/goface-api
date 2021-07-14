@@ -21,7 +21,7 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 		if name == "" {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status":  "fail",
-				"message": "Name field required",
+				"message": "Mohon isi nama",
 			})
 		}
 		filename := time.Now().Local().String() + ".jpg"
@@ -38,14 +38,14 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 			os.Remove(filepath.Join(folderSaved, filename))
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status":  "fail",
-				"message": "Detected more than one faces",
+				"message": "Terdeteksi lebih dari satu wajah",
 			})
 		}
 		if len(knownFaces) < 1 {
 			os.Remove(filepath.Join(folderSaved, filename))
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status":  "fail",
-				"message": "No face detected",
+				"message": "Wajah tidak terdeteksi",
 			})
 		}
 		encFolderSaved := filepath.Join(helper.EncodedDir, name)
@@ -74,11 +74,12 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"status":  "fail",
 				"message": "Sampel wajah kosong",
+				"detected": "unknown",
 			})
 		}
 		rec.SetSamples(samples, cats)
 
-		log.Println(len(samples))
+		log.Println(time.Since(start))
 
 		file, err := c.FormFile("file") //name=file in client html form
 		if err != nil {
@@ -111,7 +112,7 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 				"message": "Wajah tidak terdeteksi",
 			})
 		}
-		catID := rec.ClassifyThreshold(unknownFaces[0].Descriptor, 0.4)
+		catID := rec.ClassifyThreshold(unknownFaces[0].Descriptor, 0.3)
 
 		var detected string
 		if catID < 0 {
