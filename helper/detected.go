@@ -19,17 +19,17 @@ func (a DetectedSlice) Less(i, j int) bool { return a[i].distance < a[j].distanc
 
 func (slice *DetectedSlice) FillSortDetected(uFaceDescriptor face.Descriptor, samples []face.Descriptor, labels []string) {
 	for k, v := range samples {
-		dist := face.SquaredEuclideanDistance(v, uFaceDescriptor)
 		if (*slice).Len() > 0 && (*slice)[len(*slice)-1].Name == labels[k] {
 			continue
 		}
-		if dist > 0.6 {
-			break
+		dist := face.SquaredEuclideanDistance(v, uFaceDescriptor)
+		if dist > 0.5 {
+			continue
 		}
 
 		*slice = append(*slice, Detected{Name: labels[k], distance: dist})
 	}
-	*slice = append(*slice, Detected{Name: "Unknown", distance: 0.6})
+	*slice = append(*slice, Detected{Name: "Unknown", distance: 0.5})
 	sort.Sort(*slice)
 
 }
