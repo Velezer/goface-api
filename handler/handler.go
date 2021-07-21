@@ -108,7 +108,7 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		}
 
 		var dSlice helper.DetectedSlice
-		dSlice = helper.SortingDetected(unknownFaces[0].Descriptor, dSlice, samples, labels)
+		dSlice.FillSortDetected(unknownFaces[0].Descriptor, samples, labels)
 
 		var detected []string
 		for _, v := range dSlice {

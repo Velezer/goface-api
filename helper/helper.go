@@ -6,7 +6,6 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/Kagami/go-face"
@@ -20,23 +19,7 @@ var (
 	EncodedDir = filepath.Join(DataDir, "encoded")
 )
 
-func SortingDetected(uFaceDescriptor face.Descriptor, slice DetectedSlice, samples []face.Descriptor, labels []string) DetectedSlice{
-	for k, v := range samples {
-		dist := face.SquaredEuclideanDistance(v, uFaceDescriptor)
-		if slice.Len() > 0 && slice[len(slice)-1].Name == labels[k] {
-			continue
-		}
-		if dist > 0.6 {
-			break
-		}
 
-		slice = append(slice, Detected{Name: labels[k], distance: dist})
-	}
-	slice = append(slice, Detected{Name: "Unknown", distance: 0.6})
-	sort.Sort(slice)
-
-	return slice
-}
 
 func Contains(slice []string, str string) bool {
 	for _, value := range slice {
