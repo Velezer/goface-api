@@ -69,17 +69,17 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		file, err := c.FormFile("file") //name=file in client html form
 		if err != nil {
 			log.Println(err)
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status": "fail",
-				"detail": err,
+				"detail": err.Error(),
 			})
 		}
 		content, err := file.Open()
 		if err != nil {
 			log.Println(err)
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status": "fail",
-				"detail": err,
+				"detail": err.Error(),
 			})
 		}
 		helper.SaveFile(helper.DataDir, "unknown.jpg", content)
@@ -98,9 +98,9 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 			})
 		}
 
-		samples, _, labels := helper.GetSamplesCatsLabels(rec)
+		samples, labels := helper.GetSamplesLabels(rec)
 		if len(samples) == 0 {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusBadRequest, map[string]string{
 				"status":   "fail",
 				"detail":   "Sampel wajah kosong",
 				"detected": "unknown",

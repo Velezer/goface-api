@@ -19,36 +19,16 @@ var (
 	EncodedDir = filepath.Join(DataDir, "encoded")
 )
 
-
-
-func Contains(slice []string, str string) bool {
-	for _, value := range slice {
-		if value == str {
-			return true
-		}
-	}
-	return false
-}
-
-// 			encodedFile := filepath.Join(encFolder, file)
-// 			_, err := os.Stat(encodedFile)
-// 			if os.IsNotExist(err) {
-// 				knownFace, _ := rec.RecognizeSingleFile(filepath.Join(dir, file))
-// 				DumpToJson(encFolder, file, knownFace.Descriptor)
-// 			}
-
-func GetSamplesCatsLabels(rec *face.Recognizer) (samples []face.Descriptor, cats []int32, labels []string) {
+func GetSamplesLabels(rec *face.Recognizer) (samples []face.Descriptor, labels []string) {
 	dirs, _ := OSReadDir(EncodedDir, ".jpg")
 	for _, dir := range dirs {
 		encFolder := filepath.Join(EncodedDir, dir)
 		_, files := OSReadDir(encFolder, ".jpg")
-		for i, file := range files {
-			label := dir
-
+		for _, file := range files {
 			descriptor := DecodeFromJson(encFolder, file)
+			
 			samples = append(samples, descriptor)
-			cats = append(cats, int32(i))
-			labels = append(labels, label)
+			labels = append(labels, dir)
 		}
 	}
 
@@ -67,7 +47,6 @@ func OSReadDir(root string, extension string) (dirs []string, files []string) {
 	defer f.Close()
 
 	fileInfo, _ := f.Readdir(-1)
-
 	for _, file := range fileInfo {
 		if strings.Contains(file.Name(), extension) {
 			files = append(files, file.Name())
