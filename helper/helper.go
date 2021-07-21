@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/Kagami/go-face"
@@ -19,7 +20,25 @@ var (
 	EncodedDir = filepath.Join(DataDir, "encoded")
 )
 
-func contains(slice []string, str string) bool {
+func SortingDetected(uFaceDescriptor face.Descriptor, slice DetectedSlice, samples []face.Descriptor, labels []string) DetectedSlice{
+	for k, v := range samples {
+		dist := face.SquaredEuclideanDistance(v, uFaceDescriptor)
+		if slice.Len() > 0 && slice[len(slice)-1].Name == labels[k] {
+			continue
+		}
+		if dist > 0.6 {
+			break
+		}
+
+		slice = append(slice, Detected{Name: labels[k], distance: dist})
+	}
+	slice = append(slice, Detected{Name: "Unknown", distance: 0.6})
+	sort.Sort(slice)
+
+	return slice
+}
+
+func Contains(slice []string, str string) bool {
 	for _, value := range slice {
 		if value == str {
 			return true
@@ -35,16 +54,13 @@ func contains(slice []string, str string) bool {
 // 				DumpToJson(encFolder, file, knownFace.Descriptor)
 // 			}
 
-func GetSamplesCatsLabels(rec *face.Recognizer, excludes []string) (samples []face.Descriptor, cats []int32, labels []string) {
+func GetSamplesCatsLabels(rec *face.Recognizer) (samples []face.Descriptor, cats []int32, labels []string) {
 	dirs, _ := OSReadDir(EncodedDir, ".jpg")
 	for _, dir := range dirs {
 		encFolder := filepath.Join(EncodedDir, dir)
 		_, files := OSReadDir(encFolder, ".jpg")
 		for i, file := range files {
 			label := dir
-			if contains(excludes, label) {
-				continue
-			}
 
 			descriptor := DecodeFromJson(encFolder, file)
 			samples = append(samples, descriptor)

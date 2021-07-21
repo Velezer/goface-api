@@ -20,8 +20,8 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 		name := c.FormValue("name")
 		if name == "" {
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"status":  "fail",
-				"message": "Mohon isi nama",
+				"status": "fail",
+				"detail": "Mohon isi nama",
 			})
 		}
 		filename := time.Now().Local().String() + ".jpg"
@@ -37,15 +37,15 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 		if len(knownFaces) > 1 {
 			os.Remove(filepath.Join(folderSaved, filename))
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"status":  "fail",
-				"message": "Terdeteksi lebih dari satu wajah",
+				"status": "fail",
+				"detail": "Terdeteksi lebih dari satu wajah",
 			})
 		}
-		if len(knownFaces) < 1 {
+		if len(knownFaces) == 0 {
 			os.Remove(filepath.Join(folderSaved, filename))
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"status":  "fail",
-				"message": "Wajah tidak terdeteksi",
+				"status": "fail",
+				"detail": "Wajah tidak terdeteksi",
 			})
 		}
 		encFolderSaved := filepath.Join(helper.EncodedDir, name)
@@ -56,7 +56,7 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 		elapsed := time.Since(start)
 		return c.JSON(http.StatusOK, map[string]string{
 			"status":        "success",
-			"message":       "Database wajah " + name + " ditambahkan",
+			"detail":        "Database wajah " + name + " ditambahkan",
 			"response_time": elapsed.String(),
 		})
 	}
@@ -66,67 +66,60 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		start := time.Now()
 
-		formParams, _ := c.FormParams()
-		excludes := formParams["excludes"]
-
-		samples, cats, labels := helper.GetSamplesCatsLabels(rec, excludes)
-		if len(samples) == 0 {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"status":  "fail",
-				"message": "Sampel wajah kosong",
-				"detected": "unknown",
-			})
-		}
-		rec.SetSamples(samples, cats)
-
-		log.Println(time.Since(start))
-
 		file, err := c.FormFile("file") //name=file in client html form
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"status":  "fail",
-				"message": err,
+				"status": "fail",
+				"detail": err,
 			})
 		}
 		content, err := file.Open()
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"status":  "fail",
-				"message": err,
+				"status": "fail",
+				"detail": err,
 			})
 		}
 		helper.SaveFile(helper.DataDir, "unknown.jpg", content)
 
 		unknownFaces, _ := rec.RecognizeFile(filepath.Join(helper.DataDir, "unknown.jpg"))
+		if len(unknownFaces) == 0 {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"status": "fail",
+				"detail": "Wajah tidak terdeteksi",
+			})
+		}
 		if len(unknownFaces) > 1 {
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"status":  "fail",
-				"message": "Terdeteksi lebih dari satu wajah",
+				"status": "fail",
+				"detail": "Terdeteksi lebih dari satu wajah",
 			})
 		}
-		if len(unknownFaces) < 1 {
-			return c.JSON(http.StatusBadRequest, map[string]string{
-				"status":  "fail",
-				"message": "Wajah tidak terdeteksi",
-			})
-		}
-		catID := rec.ClassifyThreshold(unknownFaces[0].Descriptor, 0.3)
 
-		var detected string
-		if catID < 0 {
-			detected = "unknown"
-		} else {
-			detected = labels[catID]
+		samples, _, labels := helper.GetSamplesCatsLabels(rec)
+		if len(samples) == 0 {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"status":   "fail",
+				"detail":   "Sampel wajah kosong",
+				"detected": "unknown",
+			})
+		}
+
+		var dSlice helper.DetectedSlice
+		dSlice = helper.SortingDetected(unknownFaces[0].Descriptor, dSlice, samples, labels)
+
+		var detected []string
+		for _, v := range dSlice {
+			detected = append(detected, v.Name)
 		}
 
 		elapsed := time.Since(start)
-		log.Println("Detected:", detected, "in", elapsed.String())
+		log.Println("Detected:", dSlice, "in", elapsed.String())
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"status":        "success",
-			"detected":      detected,
-			"excludes":      excludes,
+			"data":          detected,
 			"response_time": elapsed.String(),
 		})
 
