@@ -17,19 +17,23 @@ func (a DetectedSlice) Len() int           { return len(a) }
 func (a DetectedSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a DetectedSlice) Less(i, j int) bool { return a[i].distance < a[j].distance }
 
-func (slice *DetectedSlice) FillSortDetected(uFaceDescriptor face.Descriptor, samples []face.Descriptor, labels []string) {
+func (slice *DetectedSlice) FillSortDetected(udescriptor face.Descriptor, samples []face.Descriptor, labels []string, threshold float64) {
+	*slice = append(*slice, Detected{Name: "Unknown", distance: threshold})
 	for k, v := range samples {
-		if (*slice).Len() > 0 && (*slice)[len(*slice)-1].Name == labels[k] {
+		dist := face.SquaredEuclideanDistance(udescriptor, v)
+		if dist > threshold {
 			continue
 		}
-		dist := face.SquaredEuclideanDistance(v, uFaceDescriptor)
-		if dist > 0.5 {
+		lastSlice := &(*slice)[len(*slice)-1]
+		if lastSlice.Name == labels[k] {
+			if dist < lastSlice.distance {
+				lastSlice.distance = dist
+			}
 			continue
 		}
 
 		*slice = append(*slice, Detected{Name: labels[k], distance: dist})
 	}
-	*slice = append(*slice, Detected{Name: "Unknown", distance: 0.5})
 	sort.Sort(*slice)
 
 }

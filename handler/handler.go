@@ -27,9 +27,22 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 		filename := time.Now().Local().String() + ".jpg"
 		filename = strings.Replace(filename, ":", "", -1)
 
-		file, _ := c.FormFile("file") //name=file in client html form
-		content, _ := file.Open()
-
+		file, err := c.FormFile("file") //name=file in client html form
+		if err != nil {
+			log.Println(err)
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"status": "fail",
+				"detail": err.Error(),
+			})
+		}
+		content, err := file.Open()
+		if err != nil {
+			log.Println(err)
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"status": "fail",
+				"detail": err.Error(),
+			})
+		}
 		folderSaved := filepath.Join(helper.ImagesDir, name)
 		helper.SaveFile(folderSaved, filename, content)
 
@@ -100,15 +113,14 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 
 		samples, labels := helper.GetSamplesLabels(rec)
 		if len(samples) == 0 {
-			return c.JSON(http.StatusBadRequest, map[string]string{
+			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"status":   "fail",
 				"detail":   "Sampel wajah kosong",
-				"detected": "unknown",
 			})
-		}
+		}	
 
 		var dSlice helper.DetectedSlice
-		dSlice.FillSortDetected(unknownFaces[0].Descriptor, samples, labels)
+		dSlice.FillSortDetected(unknownFaces[0].Descriptor, samples, labels, 0.3)
 
 		var detected []string
 		for _, v := range dSlice {
