@@ -69,7 +69,8 @@ func Register(rec *face.Recognizer) echo.HandlerFunc {
 		elapsed := time.Since(start)
 		return c.JSON(http.StatusOK, map[string]string{
 			"status":        "success",
-			"detail":        "Database wajah " + name + " ditambahkan",
+			"name": name,
+			"detail":        "Sukses menambahkan wajah",
 			"response_time": elapsed.String(),
 		})
 	}
@@ -120,7 +121,7 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		}	
 
 		var dSlice helper.DetectedSlice
-		dSlice.FillSortDetected(unknownFaces[0].Descriptor, samples, labels, 0.3)
+		dSlice.FillSortDetected(unknownFaces[0].Descriptor, samples, labels, 0.25)
 
 		var detected []string
 		for _, v := range dSlice {

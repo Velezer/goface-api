@@ -58,22 +58,22 @@ func OSReadDir(root string, extension string) (dirs []string, files []string) {
 	return
 }
 
-func DumpToJson(dir string, filename string, object face.Descriptor) {
+func DumpToJson(dir string, filename string, content face.Descriptor) {
 	os.Mkdir(dir, os.ModeDir)
 	file, _ := os.Create(filepath.Join(dir, filename))
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	encoder.Encode(object)
+	encoder.Encode(content)
 
 }
 
-func DecodeFromJson(dir string, filename string) (descriptor face.Descriptor) {
+func DecodeFromJson(dir string, filename string) (content face.Descriptor) {
 	file, _ := os.Open(filepath.Join(dir, filename))
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
-	decoder.Decode(&descriptor)
+	decoder.Decode(&content)
 
-	return descriptor
+	return content
 }
