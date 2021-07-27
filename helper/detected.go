@@ -3,7 +3,8 @@ package helper
 import (
 	"sort"
 
-	"github.com/Kagami/go-face")
+	"github.com/Kagami/go-face"
+)
 
 
 type Detected struct {
