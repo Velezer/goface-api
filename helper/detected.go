@@ -8,9 +8,9 @@ import (
 )
 
 type Detected struct {
-	Id       string
-	Name     string
-	distance float64
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	distance float64 
 }
 
 type DetectedSlice []Detected

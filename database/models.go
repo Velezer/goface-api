@@ -3,7 +3,7 @@ package database
 import "github.com/Kagami/go-face"
 
 type Face struct {
-	Id          string            `bson:"_id,omitempty"`
-	Name        string            `bson:"name,omitempty"`
-	Descriptors []face.Descriptor `bson:"descriptors,omitempty"`
+	Id          string            `json:"_id,omitempty" bson:"_id,omitempty"`
+	Name        string            `json:"name,omitempty" bson:"name,omitempty"`
+	Descriptors []face.Descriptor `json:"descriptors,omitempty" bson:"descriptors,omitempty"`
 }
