@@ -39,7 +39,7 @@ func InsertOne(ctx context.Context, coll *mongo.Collection, data Face) (*mongo.I
 }
 
 func PushDescriptor(ctx context.Context, coll *mongo.Collection, id interface{}, descriptor face.Descriptor) (*mongo.UpdateResult, error){
-	res, err := coll.UpdateByID(ctx, id, bson.M{"$push": descriptor})
+	res, err := coll.UpdateByID(ctx, id, bson.M{"$push": bson.M{"descriptors": descriptor}})
 	if err != nil {
 		return nil, err
 	}
