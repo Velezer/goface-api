@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Kagami/go-face v0.0.0-20210630145111-0c14797b4d0e // indirect
+	github.com/go-playground/validator/v10 v10.8.0
 	github.com/labstack/echo/v4 v4.3.0 // indirect
 	github.com/mattn/echo-livereload v0.0.0-20200327055657-db8a57cc4c02 // indirect
 	go.mongodb.org/mongo-driver v1.7.0 // indirect

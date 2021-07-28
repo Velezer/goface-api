@@ -9,3 +9,5 @@ type Handler struct {
 	Rec  *face.Recognizer
 	Coll *mongo.Collection
 }
+
+
