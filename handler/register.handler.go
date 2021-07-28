@@ -110,10 +110,7 @@ func (h Handler) Register(c echo.Context) error {
 		})
 	}
 
-	// encFolderSaved := filepath.Join(helper.EncodedDir, name)
-	// helper.DumpToJson(encFolderSaved, filename, knownFaces[0].Descriptor)
-
-	log.Println(res.InsertedID)
+	log.Println(res)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":        "success",
