@@ -8,8 +8,8 @@ import (
 
 
 type Detected struct {
-	Name     string
-	distance float64
+	Name     string 
+	distance float64 
 }
 
 type DetectedSlice []Detected

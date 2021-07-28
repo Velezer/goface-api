@@ -123,16 +123,12 @@ func Find(rec *face.Recognizer) echo.HandlerFunc {
 		var dSlice helper.DetectedSlice
 		dSlice.FillSortDetected(unknownFaces[0].Descriptor, samples, labels, 0.25)
 
-		var detected []string
-		for _, v := range dSlice {
-			detected = append(detected, v.Name)
-		}
 
 		elapsed := time.Since(start)
 		log.Println("Detected:", dSlice, "in", elapsed.String())
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"status":        "success",
-			"data":          detected,
+			"data":          dSlice,
 			"response_time": elapsed.String(),
 		})
 
