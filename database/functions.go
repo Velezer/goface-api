@@ -9,22 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func IsExist(ctx context.Context, coll *mongo.Collection, id string) {
-	cur, err := coll.Find(ctx, bson.M{"_id": id})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(ctx)
-
-	var results []interface{}
-
-	err = cur.All(ctx, &results)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println(results)
-}
 
 func InsertOne(ctx context.Context, coll *mongo.Collection, data Face) (*mongo.InsertOneResult, error) {
 	res, err := coll.InsertOne(ctx, data)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"goface-api/database"
 	"goface-api/helper"
+	"goface-api/response"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -55,7 +56,6 @@ func (h Handler) Find(c echo.Context) error {
 	}
 
 	samples := database.FindAll(context.Background(), h.Coll)
-	log.Println(len(samples))
 	if len(samples) == 0 {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"status": "fail",
@@ -63,7 +63,7 @@ func (h Handler) Find(c echo.Context) error {
 		})
 	}
 
-	var dSlice helper.DetectedSlice
+	var dSlice response.DetectedSlice
 	dSlice.FillSortDetectedFromDB(unknownFaces[0].Descriptor, samples, 0.25)
 
 	elapsed := time.Since(start)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"goface-api/handler"
 	"goface-api/helper"
+	"goface-api/config"
 	"log"
 	"net/http"
 	"time"
@@ -13,10 +14,10 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var (
-	db   *mongo.Database
 	coll *mongo.Collection
 )
 
@@ -29,16 +30,23 @@ var (
 )
 
 func initDB() {
+	conf := config.GetDBConfig()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(conf.DB_URI))
 	if err != nil {
 		log.Panicln(err)
 	}
 
-	db = client.Database("db_kita")
-	coll = db.Collection("coll_terserah")
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	db := client.Database(conf.DB_NAME)
+	coll = db.Collection(conf.DB_COLLECTION)
 }
 
 func initRecognizer() {
@@ -48,7 +56,7 @@ func initRecognizer() {
 	}
 }
 
-func releaseResource(){
+func releaseResource() {
 	rec.Close()
 }
 
