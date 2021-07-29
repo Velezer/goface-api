@@ -4,6 +4,7 @@ import (
 	"context"
 	"goface-api/helper"
 	"goface-api/models"
+	"goface-api/response"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -23,27 +24,30 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	err := validate.Struct(inputValidation{id: id, name: name})
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
 	file, err := c.FormFile("file") //name=file in client html form
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
 	content, err := file.Open()
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
@@ -55,9 +59,10 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
@@ -70,17 +75,19 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	res, err := dataFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			StatusCode: http.StatusInternalServerError,
+			Status: http.StatusText(http.StatusInternalServerError),
+			Detail: err.Error(),
 		})
 	}
 
 	log.Println(res)
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status": "success",
-		"data":   dataFace,
-		"detail": "Sukses menambahkan wajah",
+	return c.JSON(http.StatusOK, response.Response{
+		StatusCode: http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Detail: "Sukses menambahkan wajah",
+		Data: dataFace,
 	})
 }

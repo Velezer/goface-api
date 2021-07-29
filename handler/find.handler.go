@@ -18,17 +18,19 @@ func (h Handler) Find(c echo.Context) error {
 	file, err := c.FormFile("file") //name=file in client html form
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 	content, err := file.Open()
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 	helper.SaveFile(helper.DataDir, "unknown.jpg", content)
@@ -37,9 +39,10 @@ func (h Handler) Find(c echo.Context) error {
 	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, "unknown.jpg")
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 	
@@ -51,10 +54,12 @@ func (h Handler) Find(c echo.Context) error {
 
 	elapsed := time.Since(start)
 	log.Println("Detected:", dSlice, "in", elapsed.String())
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status":        "success",
-		"data":          dSlice,
-		"response_time": elapsed.String(),
+	return c.JSON(http.StatusOK, response.Response{
+		StatusCode: http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Detail: "Sukses menambahkan wajah",
+		Data: dSlice,
+		ResponseTime: elapsed.String(),
 	})
 
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"goface-api/helper"
 	"goface-api/models"
+	"goface-api/response"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -29,27 +30,30 @@ func (h Handler) Register(c echo.Context) error {
 	err := validate.Struct(inputValidation{id: id, name: name})
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
 	file, err := c.FormFile("file") //name=file in client html form
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
 	content, err := file.Open()
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 	folderSaved := filepath.Join(helper.ImagesDir, name+"_"+id)
@@ -60,9 +64,10 @@ func (h Handler) Register(c echo.Context) error {
 	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusBadRequest, response.Response{
+			StatusCode: http.StatusBadRequest,
+			Status: http.StatusText(http.StatusBadRequest),
+			Detail: err.Error(),
 		})
 	}
 
@@ -75,23 +80,26 @@ func (h Handler) Register(c echo.Context) error {
 	res, err := dataFace.InsertOne(context.Background(), h.Coll, dataFace)
 	if mongo.IsDuplicateKeyError(err) {
 		log.Println(err)
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"status": "id already created",
-			"detail": "Sukses menambahkan wajah",
+		return c.JSON(http.StatusConflict, response.Response{
+			StatusCode: http.StatusConflict,
+			Status: http.StatusText(http.StatusConflict),
+			Detail: err.Error(),
 		})
 	} else if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": err.Error(),
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			StatusCode: http.StatusInternalServerError,
+			Status: http.StatusText(http.StatusInternalServerError),
+			Detail: err.Error(),
 		})
 	}
 
 	log.Println(res)
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"status": "success",
-		"data":   dataFace,
-		"detail": "Sukses menambahkan wajah",
+	return c.JSON(http.StatusCreated, response.Response{
+		StatusCode: http.StatusCreated,
+		Status: http.StatusText(http.StatusCreated),
+		Detail: "Sukses menambahkan wajah",
+		Data: dataFace,
 	})
 }
