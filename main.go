@@ -70,11 +70,12 @@ func main() {
 	h := handler.Handler{Rec: rec, Coll: coll}
 
 	e.POST("/register", h.Register)
-	e.POST("/find", h.Find)
+	e.PATCH("/register", h.RegisterPatch)
+	e.GET("/find", h.Find)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowMethods: []string{http.MethodPatch, http.MethodPost, http.MethodGet},
 	}))
 
 	e.Logger.Fatal(e.Start(":8000"))

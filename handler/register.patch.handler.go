@@ -13,15 +13,9 @@ import (
 	"github.com/Kagami/go-face"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type inputValidation struct {
-	id   string `validate:"required"`
-	name string `validate:"required"`
-}
-
-func (h Handler) Register(c echo.Context) error {
+func (h Handler) RegisterPatch(c echo.Context) error {
 	id := c.FormValue("id")
 	name := c.FormValue("name")
 
@@ -52,6 +46,7 @@ func (h Handler) Register(c echo.Context) error {
 			"detail": err.Error(),
 		})
 	}
+
 	folderSaved := filepath.Join(helper.ImagesDir, name+"_"+id)
 	filename := time.Now().Local().String() + ".jpg"
 	filename = strings.Replace(filename, ":", "_", -1)
@@ -72,14 +67,8 @@ func (h Handler) Register(c echo.Context) error {
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	res, err := dataFace.InsertOne(context.Background(), h.Coll, dataFace)
-	if mongo.IsDuplicateKeyError(err) {
-		log.Println(err)
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"status": "id already created",
-			"detail": "Sukses menambahkan wajah",
-		})
-	} else if err != nil {
+	res, err := dataFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
+	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"status": "fail",
@@ -89,7 +78,7 @@ func (h Handler) Register(c echo.Context) error {
 
 	log.Println(res)
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "success",
 		"data":   dataFace,
 		"detail": "Sukses menambahkan wajah",

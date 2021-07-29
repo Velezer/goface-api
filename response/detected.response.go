@@ -1,7 +1,7 @@
 package response
 
 import (
-	"goface-api/database"
+	"goface-api/models"
 	"sort"
 
 	"github.com/Kagami/go-face"
@@ -19,11 +19,11 @@ func (a DetectedSlice) Len() int           { return len(a) }
 func (a DetectedSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a DetectedSlice) Less(i, j int) bool { return a[i].distance < a[j].distance }
 
-func (slice *DetectedSlice) FillSortDetectedFromDB(udescriptor face.Descriptor, sampleFaces []database.Face, threshold float64) {
+func (slice *DetectedSlice) FillSortDetectedFromDB(udesc face.Descriptor, sampleFaces []models.Face, threshold float64) {
 	*slice = append(*slice, Detected{Name: "Unknown", distance: threshold})
 	for _, value := range sampleFaces {
 		for _, desc := range value.Descriptors {
-			dist := face.SquaredEuclideanDistance(udescriptor, desc)
+			dist := face.SquaredEuclideanDistance(udesc, desc)
 			if dist > threshold {
 				continue
 			}

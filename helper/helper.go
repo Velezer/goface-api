@@ -3,6 +3,7 @@ package helper
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -14,10 +15,27 @@ import (
 const DataDir = "."
 
 var (
-	ModelDir   = filepath.Join(DataDir, "models")
+	ModelDir   = filepath.Join(DataDir, "dat_models")
 	ImagesDir  = filepath.Join(DataDir, "images")
 	EncodedDir = filepath.Join(DataDir, "encoded")
 )
+
+func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face.Face, error) {
+	knownFaces, err := rec.RecognizeFile(filepath.Join(folder, filename))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	if len(knownFaces) > 1 {
+		os.Remove(filepath.Join(folder, filename))
+		return nil, err
+	}
+	if len(knownFaces) == 0 {
+		os.Remove(filepath.Join(folder, filename))
+		return nil, err
+	}
+	return knownFaces, err
+}
 
 func GetSamplesLabels(rec *face.Recognizer) (samples []face.Descriptor, labels []string) {
 	dirs, _ := OSReadDir(EncodedDir, ".jpg")
@@ -26,7 +44,7 @@ func GetSamplesLabels(rec *face.Recognizer) (samples []face.Descriptor, labels [
 		_, files := OSReadDir(encFolder, ".jpg")
 		for _, file := range files {
 			descriptor := DecodeFromJson(encFolder, file)
-			
+
 			samples = append(samples, descriptor)
 			labels = append(labels, dir)
 		}

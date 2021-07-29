@@ -2,12 +2,11 @@ package handler
 
 import (
 	"context"
-	"goface-api/database"
+	"goface-api/models"
 	"goface-api/helper"
 	"goface-api/response"
 	"log"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -34,7 +33,8 @@ func (h Handler) Find(c echo.Context) error {
 	}
 	helper.SaveFile(helper.DataDir, "unknown.jpg", content)
 
-	unknownFaces, err := h.Rec.RecognizeFile(filepath.Join(helper.DataDir, "unknown.jpg"))
+
+	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, "unknown.jpg")
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -42,26 +42,9 @@ func (h Handler) Find(c echo.Context) error {
 			"detail": err.Error(),
 		})
 	}
-	if len(unknownFaces) == 0 {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": "Wajah tidak terdeteksi",
-		})
-	}
-	if len(unknownFaces) > 1 {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"status": "fail",
-			"detail": "Terdeteksi lebih dari satu wajah",
-		})
-	}
+	
 
-	samples := database.FindAll(context.Background(), h.Coll)
-	if len(samples) == 0 {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"status": "fail",
-			"detail": "Sampel wajah kosong",
-		})
-	}
+	samples := models.Face{}.FindAll(context.Background(), h.Coll)
 
 	var dSlice response.DetectedSlice
 	dSlice.FillSortDetectedFromDB(unknownFaces[0].Descriptor, samples, 0.25)
