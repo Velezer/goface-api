@@ -21,7 +21,7 @@ func (h Handler) Find(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
 			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 	content, err := file.Open()
@@ -30,7 +30,7 @@ func (h Handler) Find(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
 			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 	helper.SaveFile(helper.DataDir, "unknown.jpg", content)
@@ -42,7 +42,7 @@ func (h Handler) Find(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
 			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 	
@@ -57,7 +57,7 @@ func (h Handler) Find(c echo.Context) error {
 	return c.JSON(http.StatusOK, response.Response{
 		StatusCode: http.StatusOK,
 		Status: http.StatusText(http.StatusOK),
-		Detail: "Sukses menambahkan wajah",
+		Detail: "Sukses mendeteksi wajah",
 		Data: dSlice,
 		ResponseTime: elapsed.String(),
 	})

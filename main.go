@@ -69,9 +69,9 @@ func main() {
 
 	h := handler.Handler{Rec: rec, Coll: coll}
 
-	e.POST("/register", h.Register)
-	e.PATCH("/register", h.RegisterPatch)
-	e.GET("/find", h.Find)
+	e.POST("api/face/register", h.Register)
+	e.PATCH("api/face/register", h.RegisterPatch)
+	e.GET("api/face/find", h.Find)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

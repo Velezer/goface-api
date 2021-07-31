@@ -21,13 +21,13 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	name := c.FormValue("name")
 
 	validate := validator.New()
-	err := validate.Struct(inputValidation{id: id, name: name})
+	err := validate.Struct(inputValidation{Id: id, Name: name})
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
 			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 
@@ -37,7 +37,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
 			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 
@@ -62,7 +62,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
 			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 
@@ -78,7 +78,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response.Response{
 			StatusCode: http.StatusInternalServerError,
 			Status: http.StatusText(http.StatusInternalServerError),
-			Detail: err.Error(),
+			Error: err,
 		})
 	}
 

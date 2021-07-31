@@ -17,23 +17,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type inputValidation struct {
-	id   string `validate:"required"`
-	name string `validate:"required"`
-}
-
 func (h Handler) Register(c echo.Context) error {
 	id := c.FormValue("id")
 	name := c.FormValue("name")
 
 	validate := validator.New()
-	err := validate.Struct(inputValidation{id: id, name: name})
+	input := inputValidation{Id: id, Name: name}
+	err := validate.Struct(input)
+	log.Println(err)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Status:     http.StatusText(http.StatusBadRequest),
+			Error:      err,
 		})
 	}
 
@@ -42,8 +39,8 @@ func (h Handler) Register(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Status:     http.StatusText(http.StatusBadRequest),
+			Error:      err,
 		})
 	}
 
@@ -52,8 +49,8 @@ func (h Handler) Register(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Status:     http.StatusText(http.StatusBadRequest),
+			Error:      err,
 		})
 	}
 	folderSaved := filepath.Join(helper.ImagesDir, name+"_"+id)
@@ -66,8 +63,8 @@ func (h Handler) Register(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
 			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
+			Status:     http.StatusText(http.StatusBadRequest),
+			Error:      err,
 		})
 	}
 
@@ -82,24 +79,25 @@ func (h Handler) Register(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusConflict, response.Response{
 			StatusCode: http.StatusConflict,
-			Status: http.StatusText(http.StatusConflict),
-			Detail: err.Error(),
+			Status:     http.StatusText(http.StatusConflict),
+			Detail:     "_id exist in db",
+			Error:      err,
 		})
 	} else if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
 			StatusCode: http.StatusInternalServerError,
-			Status: http.StatusText(http.StatusInternalServerError),
-			Detail: err.Error(),
+			Status:     http.StatusText(http.StatusInternalServerError),
+			Error:      err,
 		})
 	}
 
-	log.Println(res)
+	log.Println("Insert data success ", res)
 
 	return c.JSON(http.StatusCreated, response.Response{
 		StatusCode: http.StatusCreated,
-		Status: http.StatusText(http.StatusCreated),
-		Detail: "Sukses menambahkan wajah",
-		Data: dataFace,
+		Status:     http.StatusText(http.StatusCreated),
+		Detail:     "Sukses menambahkan wajah",
+		Data:       dataFace,
 	})
 }
