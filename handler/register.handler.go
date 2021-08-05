@@ -43,7 +43,7 @@ func (h Handler) Register(c echo.Context) error {
 	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest,  response.Response{Error: err.Error()})
 	}
 
 	modelFace := models.Face{

@@ -26,7 +26,7 @@ func (h Handler) Find(c echo.Context) error {
 	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, "unknown.jpg")
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
 	}
 
 	modelFace := models.Face{}                                                                          

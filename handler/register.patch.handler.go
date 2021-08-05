@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/response"
@@ -41,7 +42,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
 	}
 
 	modelFace := models.Face{
@@ -52,8 +53,9 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 
 	res, err := modelFace.FindById(context.Background(), h.Coll, id)
 	if len(res) == 0 {
-		log.Println("id not found")
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "id not found"})
+		err = errors.New("id " + id + " not found")
+		log.Println(err)
+		return c.JSON(http.StatusNotFound, response.Response{Error: err.Error()})
 	}
 	if err != nil {
 		log.Println(err)
