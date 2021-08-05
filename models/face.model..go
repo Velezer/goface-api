@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"log"
 
 	"github.com/Kagami/go-face"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,13 +33,13 @@ func (face Face) PushDescriptor(ctx context.Context, coll *mongo.Collection, id 
 	return res, nil
 }
 
-func (face Face) FindAll(ctx context.Context, coll *mongo.Collection) (dataResult []Face) {
+func (face Face) FindAll(ctx context.Context, coll *mongo.Collection) (res []Face, err error) {
 	cursor, err := coll.Find(ctx, bson.M{})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	if err = cursor.All(ctx, &dataResult); err != nil {
-		log.Fatal(err)
+	if err = cursor.All(ctx, &res); err != nil {
+		return nil, err
 	}
-	return
+	return res, nil
 }

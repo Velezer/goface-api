@@ -25,29 +25,15 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
 			Error: err,
 		})
 	}
 
-	file, err := c.FormFile("file") //name=file in client html form
+	content, err := getFileContent(c, "file")
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
 			Error: err,
-		})
-	}
-
-	content, err := file.Open()
-	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
-			Detail: err.Error(),
 		})
 	}
 
@@ -60,24 +46,20 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
 			Error: err,
 		})
 	}
 
-	dataFace := models.Face{
+	modelFace := models.Face{
 		Id:          id,
 		Name:        name,
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	res, err := dataFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
+	res, err := modelFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: http.StatusInternalServerError,
-			Status: http.StatusText(http.StatusInternalServerError),
 			Error: err,
 		})
 	}
@@ -85,9 +67,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	log.Println(res)
 
 	return c.JSON(http.StatusOK, response.Response{
-		StatusCode: http.StatusOK,
-		Status: http.StatusText(http.StatusOK),
-		Detail: "Sukses menambahkan wajah",
-		Data: dataFace,
+		Detail: "Sukses menambahkan descriptor wajah " + modelFace.Name,
+		Data:   modelFace,
 	})
 }

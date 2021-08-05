@@ -28,31 +28,18 @@ func (h Handler) Register(c echo.Context) error {
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status:     http.StatusText(http.StatusBadRequest),
-			Error:      err,
+			Error:  err,
 		})
 	}
 
-	file, err := c.FormFile("file") //name=file in client html form
+	content, err := getFileContent(c, "file")
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status:     http.StatusText(http.StatusBadRequest),
-			Error:      err,
+			Error: err,
 		})
 	}
-
-	content, err := file.Open()
-	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status:     http.StatusText(http.StatusBadRequest),
-			Error:      err,
-		})
-	}
+	
 	folderSaved := filepath.Join(helper.ImagesDir, name+"_"+id)
 	filename := time.Now().Local().String() + ".jpg"
 	filename = strings.Replace(filename, ":", "_", -1)
@@ -62,42 +49,34 @@ func (h Handler) Register(c echo.Context) error {
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: http.StatusBadRequest,
-			Status:     http.StatusText(http.StatusBadRequest),
-			Error:      err,
+			Error: err,
 		})
 	}
 
-	dataFace := models.Face{
+	modelFace := models.Face{
 		Id:          id,
 		Name:        name,
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	res, err := dataFace.InsertOne(context.Background(), h.Coll, dataFace)
+	res, err := modelFace.InsertOne(context.Background(), h.Coll, modelFace)
 	if mongo.IsDuplicateKeyError(err) {
 		log.Println(err)
 		return c.JSON(http.StatusConflict, response.Response{
-			StatusCode: http.StatusConflict,
-			Status:     http.StatusText(http.StatusConflict),
-			Detail:     "_id exist in db",
-			Error:      err,
+			Detail: "_id exist in db",
+			Error:  err,
 		})
 	} else if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: http.StatusInternalServerError,
-			Status:     http.StatusText(http.StatusInternalServerError),
-			Error:      err,
+			Error: err,
 		})
 	}
 
 	log.Println("Insert data success ", res)
 
 	return c.JSON(http.StatusCreated, response.Response{
-		StatusCode: http.StatusCreated,
-		Status:     http.StatusText(http.StatusCreated),
-		Detail:     "Sukses menambahkan wajah",
-		Data:       dataFace,
+		Detail: "Sukses menambahkan wajah",
+		Data:   modelFace,
 	})
 }

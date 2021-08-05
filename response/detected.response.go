@@ -28,7 +28,7 @@ func (slice *DetectedSlice) FillSortDetectedFromDB(udesc face.Descriptor, sample
 				continue
 			}
 
-			if lastSlice := &(*slice)[len(*slice)-1]; lastSlice.Name == value.Name {
+			if lastSlice := (*slice)[len(*slice)-1]; lastSlice.Name == value.Name {
 				if dist < lastSlice.Distance {
 					lastSlice.Distance = dist
 				}
@@ -39,7 +39,7 @@ func (slice *DetectedSlice) FillSortDetectedFromDB(udesc face.Descriptor, sample
 		}
 
 	}
-	sort.Sort(*slice)
+	sort.Sort(slice)
 
 }
 
