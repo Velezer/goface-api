@@ -27,17 +27,12 @@ func (h Handler) Register(c echo.Context) error {
 	log.Println(err)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			Error:  err,
-		})
+		return c.JSON(http.StatusBadRequest, err)
 	}
-
 	content, err := getFileContent(c, "file")
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusBadRequest, err)
 	}
 	
 	folderSaved := filepath.Join(helper.ImagesDir, name+"_"+id)
@@ -48,9 +43,7 @@ func (h Handler) Register(c echo.Context) error {
 	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	modelFace := models.Face{
@@ -62,15 +55,10 @@ func (h Handler) Register(c echo.Context) error {
 	res, err := modelFace.InsertOne(context.Background(), h.Coll, modelFace)
 	if mongo.IsDuplicateKeyError(err) {
 		log.Println(err)
-		return c.JSON(http.StatusConflict, response.Response{
-			Detail: "_id exist in db",
-			Error:  err,
-		})
+		return c.JSON(http.StatusConflict, err)
 	} else if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	log.Println("Insert data success ", res)

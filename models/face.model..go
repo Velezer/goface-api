@@ -33,6 +33,17 @@ func (face Face) PushDescriptor(ctx context.Context, coll *mongo.Collection, id 
 	return res, nil
 }
 
+func (face Face) FindById(ctx context.Context, coll *mongo.Collection, id string) (res []Face, err error) {
+	cursor, err := coll.Find(ctx, bson.M{"_id": id})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(ctx, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (face Face) FindAll(ctx context.Context, coll *mongo.Collection) (res []Face, err error) {
 	cursor, err := coll.Find(ctx, bson.M{})
 	if err != nil {

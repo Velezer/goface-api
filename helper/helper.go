@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -25,16 +24,17 @@ func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face
 	knownFaces, err := rec.RecognizeFile(filepath.Join(folder, filename))
 	if err != nil {
 		os.Remove(filepath.Join(folder, filename))
-		log.Println(err)
 		return nil, err
 	}
 	if len(knownFaces) > 1 {
 		os.Remove(filepath.Join(folder, filename))
-		return nil, errors.New("detected more than one face, only support one face")
+		err = errors.New("detected more than one face, only support one face")
+		return nil, err
 	}
 	if len(knownFaces) == 0 {
 		os.Remove(filepath.Join(folder, filename))
-		return nil, errors.New("no face detected")
+		err = errors.New("no face detected")
+		return nil, err
 	}
 	return knownFaces, err
 }

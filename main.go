@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"goface-api/config"
 	"goface-api/handler"
 	"goface-api/helper"
-	"goface-api/config"
 	"log"
 	"net/http"
 	"time"
@@ -72,6 +72,7 @@ func main() {
 	e.POST("api/face/register", h.Register)
 	e.PATCH("api/face/register", h.RegisterPatch)
 	e.GET("api/face/find", h.Find)
+
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

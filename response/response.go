@@ -5,4 +5,5 @@ type Response struct{
 	Data interface{} `json:"data,omitempty"`
 	ResponseTime string `json:"response_time,omitempty"`
 	Error error `json:"error,omitempty"`
+
 }

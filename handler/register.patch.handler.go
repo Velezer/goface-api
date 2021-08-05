@@ -24,17 +24,13 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	err := validate.Struct(inputValidation{Id: id, Name: name})
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	content, err := getFileContent(c, "file")
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	folderSaved := filepath.Join(helper.ImagesDir, name+"_"+id)
@@ -45,9 +41,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	modelFace := models.Face{
@@ -56,15 +50,23 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	res, err := modelFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
+	res, err := modelFace.FindById(context.Background(), h.Coll, id)
+	if len(res) == 0 {
+		log.Println("id not found")
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "id not found"})
+	}
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, response.Response{
-			Error: err,
-		})
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	log.Println(res)
+	_, err = modelFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	log.Println("Sukses menambahkan descriptor wajah ", modelFace.Name, modelFace.Id)
 
 	return c.JSON(http.StatusOK, response.Response{
 		Detail: "Sukses menambahkan descriptor wajah " + modelFace.Name,
