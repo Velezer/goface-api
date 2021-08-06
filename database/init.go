@@ -11,11 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var (
-	DB *mongo.Database
-)
 
-func InitDB() {
+func InitDB() *mongo.Database {
 	conf := config.GetDBConfig()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -31,6 +28,6 @@ func InitDB() {
 		log.Panicln(err)
 	}
 
-	DB = client.Database(conf.DB_NAME)
-	
+	DB := client.Database(conf.DB_NAME)
+	return DB
 }

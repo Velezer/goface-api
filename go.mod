@@ -9,4 +9,5 @@ require (
 	github.com/labstack/echo/v4 v4.3.0 // indirect
 	github.com/mattn/echo-livereload v0.0.0-20200327055657-db8a57cc4c02 // indirect
 	go.mongodb.org/mongo-driver v1.7.0 // indirect
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 )

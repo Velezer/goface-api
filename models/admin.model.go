@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const collectionName string = "coll_admin"
+const collectionAdmin string = "coll_admin"
 
 type Admin struct {
 	Username string `bson:"admin" validate:"required"`
@@ -14,7 +14,7 @@ type Admin struct {
 }
 
 func (admin Admin) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
-	coll := db.Collection(collectionName)
+	coll := db.Collection(collectionAdmin)
 	res, err := coll.InsertOne(ctx, admin)
 	if err != nil {
 		return nil, err

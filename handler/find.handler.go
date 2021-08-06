@@ -31,7 +31,7 @@ func (h Handler) Find(c echo.Context) error {
 
 	modelFace := models.Face{}                                                                          
 
-	samples, err := modelFace.FindAll(context.Background(), h.Coll)
+	samples, err := modelFace.FindAll(context.Background(), h.DB)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err)

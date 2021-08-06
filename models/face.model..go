@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const collectionFace string = "coll_terserah"
 
 type Face struct {
 	Id          string            `json:"_id,omitempty" bson:"_id,omitempty"`
@@ -17,7 +18,8 @@ type Face struct {
 
 
 
-func (face Face) InsertOne(ctx context.Context, coll *mongo.Collection) (*mongo.InsertOneResult, error) {
+func (face Face) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
+	coll := db.Collection(collectionFace)
 	res, err := coll.InsertOne(ctx, face)
 	if err != nil {
 		return nil, err
@@ -25,7 +27,8 @@ func (face Face) InsertOne(ctx context.Context, coll *mongo.Collection) (*mongo.
 	return res, nil
 }
 
-func (face Face) PushDescriptor(ctx context.Context, coll *mongo.Collection) (*mongo.UpdateResult, error) {
+func (face Face) PushDescriptor(ctx context.Context, db *mongo.Database) (*mongo.UpdateResult, error) {
+	coll := db.Collection(collectionFace)
 	res, err := coll.UpdateByID(ctx, face.Id, bson.M{"$push": bson.M{"descriptors": face.Descriptors[0]}})
 	if err != nil {
 		return nil, err
@@ -33,7 +36,8 @@ func (face Face) PushDescriptor(ctx context.Context, coll *mongo.Collection) (*m
 	return res, nil
 }
 
-func (face Face) FindById(ctx context.Context, coll *mongo.Collection) (res []Face, err error) {
+func (face Face) FindById(ctx context.Context, db *mongo.Database) (res []Face, err error) {
+	coll := db.Collection(collectionFace)
 	cursor, err := coll.Find(ctx, bson.M{"_id": face.Id})
 	if err != nil {
 		return nil, err
@@ -44,7 +48,8 @@ func (face Face) FindById(ctx context.Context, coll *mongo.Collection) (res []Fa
 	return res, nil
 }
 
-func (face Face) FindAll(ctx context.Context, coll *mongo.Collection) (res []Face, err error) {
+func (face Face) FindAll(ctx context.Context, db *mongo.Database) (res []Face, err error) {
+	coll := db.Collection(collectionFace)
 	cursor, err := coll.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err

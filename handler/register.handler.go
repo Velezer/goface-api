@@ -51,7 +51,7 @@ func (h Handler) Register(c echo.Context) error {
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	res, err := modelFace.InsertOne(context.Background(), h.Coll)
+	res, err := modelFace.InsertOne(context.Background(), h.DB)
 	if mongo.IsDuplicateKeyError(err) {
 		log.Println(err)
 		return c.JSON(http.StatusConflict, err)
