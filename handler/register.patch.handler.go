@@ -51,7 +51,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	res, err := modelFace.FindById(context.Background(), h.Coll, id)
+	res, err := modelFace.FindById(context.Background(), h.Coll)
 	if len(res) == 0 {
 		err = errors.New("id " + id + " not found")
 		log.Println(err)
@@ -62,7 +62,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	_, err = modelFace.PushDescriptor(context.Background(), h.Coll, id, knownFaces[0].Descriptor)
+	_, err = modelFace.PushDescriptor(context.Background(), h.Coll)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, err)

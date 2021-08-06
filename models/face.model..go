@@ -17,24 +17,24 @@ type Face struct {
 
 
 
-func (face Face) InsertOne(ctx context.Context, coll *mongo.Collection, data Face) (*mongo.InsertOneResult, error) {
-	res, err := coll.InsertOne(ctx, data)
+func (face Face) InsertOne(ctx context.Context, coll *mongo.Collection) (*mongo.InsertOneResult, error) {
+	res, err := coll.InsertOne(ctx, face)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (face Face) PushDescriptor(ctx context.Context, coll *mongo.Collection, id interface{}, descriptor face.Descriptor) (*mongo.UpdateResult, error) {
-	res, err := coll.UpdateByID(ctx, id, bson.M{"$push": bson.M{"descriptors": descriptor}})
+func (face Face) PushDescriptor(ctx context.Context, coll *mongo.Collection) (*mongo.UpdateResult, error) {
+	res, err := coll.UpdateByID(ctx, face.Id, bson.M{"$push": bson.M{"descriptors": face.Descriptors[0]}})
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (face Face) FindById(ctx context.Context, coll *mongo.Collection, id string) (res []Face, err error) {
-	cursor, err := coll.Find(ctx, bson.M{"_id": id})
+func (face Face) FindById(ctx context.Context, coll *mongo.Collection) (res []Face, err error) {
+	cursor, err := coll.Find(ctx, bson.M{"_id": face.Id})
 	if err != nil {
 		return nil, err
 	}
