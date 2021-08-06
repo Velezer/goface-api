@@ -24,10 +24,9 @@ func (h Handler) Register(c echo.Context) error {
 	validate := validator.New()
 	input := inputValidation{Id: id, Name: name}
 	err := validate.Struct(input)
-	log.Println(err)
 	if err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	content, err := getFileContent(c, "file")
 	if err != nil {

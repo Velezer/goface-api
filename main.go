@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"goface-api/config"
+	"goface-api/database"
 	"goface-api/handler"
 	"goface-api/helper"
+	"goface-api/routes"
 	"log"
 	"net/http"
 	"time"
@@ -18,6 +20,7 @@ import (
 )
 
 var (
+	db *mongo.Database
 	coll *mongo.Collection
 )
 
@@ -45,7 +48,7 @@ func initDB() {
 		log.Panicln(err)
 	}
 
-	db := client.Database(conf.DB_NAME)
+	db = client.Database(conf.DB_NAME)
 	coll = db.Collection(conf.DB_COLLECTION)
 }
 
@@ -63,16 +66,13 @@ func releaseResource() {
 func main() {
 	initDB()
 	initRecognizer()
+	database.InitDB()
 	defer releaseResource()
-
+	
+	h := handler.Handler{Rec: rec, Coll: coll, DB:db}
 	e := echo.New()
 
-	h := handler.Handler{Rec: rec, Coll: coll}
-
-	e.POST("api/face/register", h.Register)
-	e.PATCH("api/face/register", h.RegisterPatch)
-	e.GET("api/face/find", h.Find)
-
+	routes.Init(e, h)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

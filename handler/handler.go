@@ -11,6 +11,7 @@ import (
 type Handler struct {
 	Rec  *face.Recognizer
 	Coll *mongo.Collection
+	DB *mongo.Database
 }
 
 
