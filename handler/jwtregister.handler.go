@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (h Handler) JWTRegister(c echo.Context) error {
@@ -26,7 +27,15 @@ func (h Handler) JWTRegister(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
 	}
-	
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
+	}
+
+	modelAdmin.Password = string(hashed)
+
 	_, err = modelAdmin.InsertOne(context.Background(), h.DB)
 	if err != nil {
 		log.Println(err)
