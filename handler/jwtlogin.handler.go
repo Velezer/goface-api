@@ -4,20 +4,14 @@ import (
 	"context"
 	"goface-api/models"
 	"goface-api/response"
+	"goface-api/mymiddleware"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type jwtCustomClaims struct {
-	Name  string `json:"name"`
-	Admin bool   `json:"admin"`
-	jwt.StandardClaims
-}
 
 func (h Handler) JWTLogin(c echo.Context) error {
 	username := c.FormValue("username")
@@ -25,7 +19,7 @@ func (h Handler) JWTLogin(c echo.Context) error {
 
 
 	modelAdmin := models.Admin{Username: username}
-	res, err := modelAdmin.FindOneByUsername(context.Background(), h.DB)
+	res, err := modelAdmin.FindOneByID(context.Background(), h.DB) // _id equal username
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
@@ -38,13 +32,7 @@ func (h Handler) JWTLogin(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
 	}
 
-	claims := &jwtCustomClaims{
-		"Krefa",
-		true,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-		},
-	}
+	claims := mymiddleware.Claims
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

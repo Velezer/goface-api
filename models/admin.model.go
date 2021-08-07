@@ -23,9 +23,9 @@ func (admin Admin) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.In
 	return res, nil
 }
 
-func (admin Admin) FindOneByUsername(ctx context.Context, db *mongo.Database) (res Admin, err error) {
+func (admin Admin) FindOneByID(ctx context.Context, db *mongo.Database) (res Admin, err error) {
 	coll := db.Collection(collectionAdmin)
-	cursor := coll.FindOne(ctx, bson.M{"username": admin.Username})
+	cursor := coll.FindOne(ctx, bson.M{"_id": admin.Username})
 
 	if err = cursor.Decode(&res); err != nil {
 		return res, err
