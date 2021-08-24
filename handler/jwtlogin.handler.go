@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 	"goface-api/models"
-	"goface-api/response"
 	"goface-api/mymiddleware"
+	"goface-api/response"
 	"log"
 	"net/http"
 
@@ -14,17 +14,24 @@ import (
 )
 
 func (h Handler) JWTLogin(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
 
+	data := echo.Map{}
 
+	if err := c.Bind(&data); err != nil {
+		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
+	}
+	
+	username := data["username"].(string)
+	password := data["password"].(string)
+
+	log.Println(c.Get("username"))
+	log.Println(username)
 	modelAdmin := models.Admin{Username: username}
 	res, err := modelAdmin.FindOneByID(context.Background(), h.DB) // _id equal username
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
 	}
-
 
 	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(password))
 	if err != nil {
