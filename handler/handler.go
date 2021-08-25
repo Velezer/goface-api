@@ -16,7 +16,7 @@ type Handler struct {
 
 
 type inputValidation struct {
-	Id   string `validate:"required"`
+	Id   string `validate:"required,gte=9,lte=16"`
 	Name string `validate:"required"`
 }
 
