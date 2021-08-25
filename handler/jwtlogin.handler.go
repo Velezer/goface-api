@@ -20,12 +20,11 @@ func (h Handler) JWTLogin(c echo.Context) error {
 	if err := c.Bind(&data); err != nil {
 		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
 	}
-	
+
 	username := data["username"].(string)
 	password := data["password"].(string)
 
-	log.Println(c.Get("username"))
-	log.Println(username)
+	log.Println(username, "login jwt")
 	modelAdmin := models.Admin{Username: username}
 	res, err := modelAdmin.FindOneByID(context.Background(), h.DB) // _id equal username
 	if err != nil {
