@@ -16,8 +16,6 @@ type Face struct {
 	Descriptors []face.Descriptor `json:"descriptors,omitempty" bson:"descriptors,omitempty"`
 }
 
-
-
 func (face Face) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
 	coll := db.Collection(collectionFace)
 	res, err := coll.InsertOne(ctx, face)
@@ -58,4 +56,13 @@ func (face Face) FindAll(ctx context.Context, db *mongo.Database) (res []Face, e
 		return nil, err
 	}
 	return res, nil
+}
+
+func (face Face) Delete(ctx context.Context, db *mongo.Database) (err error) {
+	coll := db.Collection(collectionFace)
+	_, err = coll.DeleteOne(ctx, bson.M{"_id": face.Id})
+	if err != nil {
+		return err
+	}
+	return nil
 }
