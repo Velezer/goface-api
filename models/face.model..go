@@ -58,11 +58,11 @@ func (face Face) FindAll(ctx context.Context, db *mongo.Database) (res []Face, e
 	return res, nil
 }
 
-func (face Face) Delete(ctx context.Context, db *mongo.Database) (err error) {
+func (face Face) Delete(ctx context.Context, db *mongo.Database) (*mongo.DeleteResult, error) {
 	coll := db.Collection(collectionFace)
-	_, err = coll.DeleteOne(ctx, bson.M{"_id": face.Id})
+	res, err := coll.DeleteOne(ctx, bson.M{"_id": face.Id})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return res, nil
 }

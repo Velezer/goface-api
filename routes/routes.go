@@ -12,6 +12,8 @@ func Init(e *echo.Echo, h handler.Handler) {
 	e.POST("api/face/find", h.Find, mymiddleware.JWTAuth)
 	e.POST("api/face/register", h.Register, mymiddleware.JWTAuth)
 	e.PUT("api/face/register", h.RegisterPatch, mymiddleware.JWTAuth)
+
+	e.GET("api/face", h.FaceAll, mymiddleware.JWTAuth)
 	e.DELETE("api/face/:id", h.Delete, mymiddleware.JWTAuth)
 
 
