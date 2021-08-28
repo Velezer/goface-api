@@ -14,9 +14,9 @@ func (h Handler) Delete(c echo.Context) error {
 	id := c.Param("id")
 
 	modelFace := models.Face{Id: id}
-	res,err := modelFace.Delete(context.Background(), h.DB)
+	res,err := modelFace.DeleteId(context.Background(), h.DB)
 	if err != nil {
-		log.Println("delete error:", err)
+		log.Println("DeleteId error:", err)
 		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
 	}
 	log.Println("delete count:",res.DeletedCount)
