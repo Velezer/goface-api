@@ -25,7 +25,6 @@ func (h Handler) JWTLogin(c echo.Context) error {
 
 	log.Println(modelAdmin.Username, "login jwt")
 
-
 	v := validator.New()
 	err = v.Struct(modelAdmin)
 	if err != nil {
@@ -59,8 +58,6 @@ func (h Handler) JWTLogin(c echo.Context) error {
 	})
 }
 
-
-
 func (h Handler) JWTRegister(c echo.Context) error {
 	modelAdmin := models.Admin{}
 	err := c.Bind(&modelAdmin)
@@ -68,7 +65,7 @@ func (h Handler) JWTRegister(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-
+	log.Println("registering", modelAdmin)
 	v := validator.New()
 	err = v.Struct(modelAdmin)
 	if err != nil {
@@ -94,4 +91,3 @@ func (h Handler) JWTRegister(c echo.Context) error {
 		Detail: "Admin created",
 	})
 }
-

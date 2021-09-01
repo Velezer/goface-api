@@ -10,8 +10,8 @@ import (
 const collectionAdmin string = "coll_admin"
 
 type Admin struct {
-	Username string `bson:"_id" validate:"required"`
-	Password string `bson:"password" validate:"required"`
+	Username string `bson:"_id" form:"username" validate:"required"`
+	Password string `bson:"password" form:"password" validate:"required"`
 }
 
 func (admin Admin) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
