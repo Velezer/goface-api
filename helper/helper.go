@@ -32,7 +32,7 @@ func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face
 		return nil, err
 	}
 	if len(knownFaces) == 0 {
-		os.Remove(filepath.Join(folder, filename))
+		// os.Remove(filepath.Join(folder, filename))
 		err = errors.New("no face detected")
 		return nil, err
 	}

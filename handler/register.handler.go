@@ -35,6 +35,7 @@ func prepModelFace(c echo.Context, h Handler, input inputValidation) (models.Fac
 	if err != nil {
 		return models.Face{}, err
 	}
+	log.Println("register content ", content)
 
 	folderSaved := filepath.Join(helper.ImagesDir, input.Name+"_"+input.Id)
 	filename := time.Now().Local().String() + ".jpg"
@@ -61,12 +62,14 @@ func (h Handler) Register(c echo.Context) error {
 		log.Println(helper.ParseValidationErrors(err))
 		return c.JSON(http.StatusBadRequest, helper.ParseValidationErrors(err))
 	}
+	log.Println("register input ", input)
 	modelFace, err := prepModelFace(c, h, input)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	
+	log.Println("register modelFace ", modelFace)
+
 	res, err := modelFace.InsertOne(context.Background(), h.DB)
 	if mongo.IsDuplicateKeyError(err) {
 		log.Println(err)
