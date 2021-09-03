@@ -42,3 +42,19 @@ func (h Handler) FaceAll(c echo.Context) error {
 	log.Println("FindAll success!")
 	return c.JSON(http.StatusOK, response.Response{Data: resFaces})
 }
+
+func (h Handler) FaceId(c echo.Context) error {
+	modelFace := models.Face{Id: c.Param("id")}
+	faces, err := modelFace.FindById(context.Background(), h.DB)
+	if err != nil {
+		log.Println("FindById error:", err)
+		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
+	}
+
+	resFaces := []response.FaceLenDesc{}
+	for _, face := range faces {
+		resFaces = append(resFaces, response.FaceLenDesc{Id: face.Id, Name: face.Name, Descriptors: len(face.Descriptors)})
+	}
+	log.Println("FindById success!:",resFaces)
+	return c.JSON(http.StatusOK, response.Response{Data: resFaces})
+}
