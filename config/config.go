@@ -1,11 +1,5 @@
 package config
 
-import (
-	"os"
-
-	_ "github.com/joho/godotenv/autoload"
-)
-
 type dbConfig struct {
 	DB_URI        string
 	DB_NAME       string
@@ -13,7 +7,7 @@ type dbConfig struct {
 
 func GetDBConfig() dbConfig {
 	return dbConfig{
-		DB_URI:        os.Getenv("DB_URI_LOCAL"),
-		DB_NAME:       os.Getenv("DB_NAME"),
+		DB_URI:        "mongodb://localhost:27017",
+		DB_NAME:       "db_kita",
 	}
 }

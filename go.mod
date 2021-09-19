@@ -9,7 +9,6 @@ require (
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974 // indirect
 	github.com/go-playground/validator/v10 v10.8.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/labstack/echo/v4 v4.3.0 // indirect
 	github.com/mattn/echo-livereload v0.0.0-20200327055657-db8a57cc4c02 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect

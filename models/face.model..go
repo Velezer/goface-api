@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const collectionFace string = "coll_face"
+const collectionFace string = "coll_terserah"
 
 type Face struct {
 	Id          string            `json:"_id,omitempty" bson:"_id,omitempty"`
