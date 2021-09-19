@@ -37,21 +37,21 @@ func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face
 	return knownFaces, err
 }
 
-func GetSamplesLabels(rec *face.Recognizer) (samples []face.Descriptor, labels []string) {
-	dirs, _ := OSReadDir(EncodedDir, ".jpg")
-	for _, dir := range dirs {
-		encFolder := filepath.Join(EncodedDir, dir)
-		_, files := OSReadDir(encFolder, ".jpg")
-		for _, file := range files {
-			descriptor := DecodeFromJson(encFolder, file)
+// func GetSamplesLabels(rec *face.Recognizer) (samples []face.Descriptor, labels []string) {
+// 	dirs, _ := OSReadDir(EncodedDir, ".jpg")
+// 	for _, dir := range dirs {
+// 		encFolder := filepath.Join(EncodedDir, dir)
+// 		_, files := OSReadDir(encFolder, ".jpg")
+// 		for _, file := range files {
+// 			descriptor := DecodeFromJson(encFolder, file)
 
-			samples = append(samples, descriptor)
-			labels = append(labels, dir)
-		}
-	}
+// 			samples = append(samples, descriptor)
+// 			labels = append(labels, dir)
+// 		}
+// 	}
 
-	return
-}
+// 	return
+// }
 
 func SaveFile(dir string, filename string, content multipart.File) {
 	os.Mkdir(dir, os.ModeDir)
