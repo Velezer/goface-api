@@ -15,7 +15,7 @@ import (
 func InitDB() *mongo.Database {
 	conf := config.GetDBConfig()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(conf.DB_URI))

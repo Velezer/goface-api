@@ -13,7 +13,7 @@ type dbConfig struct {
 
 func GetDBConfig() dbConfig {
 	return dbConfig{
-		DB_URI:        os.Getenv("DB_URI_LOCAL"),
+		DB_URI:        os.Getenv("DB_URI_CLOUD"),
 		DB_NAME:       os.Getenv("DB_NAME"),
 	}
 }
