@@ -22,17 +22,15 @@ var (
 
 func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face.Face, error) {
 	knownFaces, err := rec.RecognizeFile(filepath.Join(folder, filename))
+	os.Remove(filepath.Join(folder, filename))
 	if err != nil {
-		os.Remove(filepath.Join(folder, filename))
 		return nil, err
 	}
 	if len(knownFaces) > 1 {
-		os.Remove(filepath.Join(folder, filename))
 		err = errors.New("detected more than one face, only support one face")
 		return nil, err
 	}
 	if len(knownFaces) == 0 {
-		// os.Remove(filepath.Join(folder, filename))
 		err = errors.New("no face detected")
 		return nil, err
 	}
