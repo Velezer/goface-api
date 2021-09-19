@@ -7,6 +7,7 @@ import (
 	"goface-api/routes"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Kagami/go-face"
 	"github.com/labstack/echo/v4"
@@ -48,6 +49,7 @@ func main() {
 		AllowMethods: []string{http.MethodOptions, http.MethodConnect, http.MethodTrace, http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete},
 	}))
 
-	e.Logger.Fatal(e.Start(":8000"))
+	port := os.Getenv("PORT")
+	e.Logger.Fatal(e.Start(":" + port))
 
 }
