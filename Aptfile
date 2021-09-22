@@ -4,4 +4,7 @@ libdlib-dev
 libblas-dev
 libatlas-base-dev
 liblapack-dev
+liblapack3
+libopenblas-base
+libopenblas-dev
 libjpeg-turbo8-dev
