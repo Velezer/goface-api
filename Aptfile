@@ -1,10 +1,18 @@
 # use this file by using buildpack
 libx11-dev
+
 libdlib-dev
-libblas-dev
+
 libatlas-base-dev
+
 liblapack-dev
 liblapack3
+
 libopenblas-base
 libopenblas-dev
+
 libjpeg-turbo8-dev
+
+libblas-common
+libblas-dev
+libblas3
