@@ -1,4 +1,5 @@
 # use this file by using buildpack
+libx11-dev
 libdlib-dev
 libblas-dev
 libatlas-base-dev
