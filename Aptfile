@@ -1,4 +1,6 @@
 # use this file by using buildpack
+build-essential
+
 libx11-dev
 
 libdlib-dev
@@ -13,6 +15,5 @@ libopenblas-dev
 
 libjpeg-turbo8-dev
 
-libblas-common
 libblas-dev
 libblas3
