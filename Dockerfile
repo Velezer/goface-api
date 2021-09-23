@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y
 RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 #RUN apt-get install libjpeg-turbo8-dev -y
 #RUN apt-get install libjpeg62-turbo-dev -y
-RUN go get -d -v ./...
+# RUN go get -d -v ./...
 
 #ENV DB_URI_CLOUD=
 ENV DB_NAME=db_goface_api_echo
