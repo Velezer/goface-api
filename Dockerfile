@@ -15,12 +15,11 @@ RUN go get -d -v ./...
 #ENV DB_URI_CLOUD=
 ENV DB_NAME=db_goface_api_echo
 
-RUN go build -o /docker-app
+# RUN go build -o /docker-app
+# CMD [ "/docker-app" ]
 
-CMD [ "/docker-app" ]
 
-
-# CMD [ "go","run","main.go" ] # run without go build
+CMD [ "go","run","main.go" ] # run without go build
 
 
 
