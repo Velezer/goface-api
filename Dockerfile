@@ -2,10 +2,14 @@
 FROM golang:1.16.8 
 COPY . /app/.
 RUN apt-get update && apt-get install -y
-RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev libjpeg-turbo8-dev -y
+RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev 
+#RUN apt-get install libjpeg-turbo8-dev -y
 RUN go get -d -v ./...
 
-CMD [ "go","run","main.go" ]
+#ENV DB_URI_CLOUD=
+ENV DB_NAME=db_goface_api_echo
+
+CMD [ "go","run","/app/main.go" ]
 
 
 
