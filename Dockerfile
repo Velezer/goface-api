@@ -15,13 +15,10 @@ RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 RUN go mod download
 
 
-# RUN go get -d -v ./...
 RUN go build -o /docker-app
 CMD [ "/docker-app" ]
 ENTRYPOINT ["/docker-app"]
 
-# run without go build
-# CMD [ "go","run","main.go","-p","$PORT" ] 
 
 
 
