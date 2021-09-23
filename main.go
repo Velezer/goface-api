@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/Kagami/go-face"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"goface-api/database"
 	"goface-api/handler"
 	"goface-api/helper"
@@ -8,9 +11,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"github.com/Kagami/go-face"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 var (
@@ -44,8 +44,8 @@ func main() {
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
-		AllowMethods: []string{http.MethodOptions, http.MethodConnect, http.MethodTrace, http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderAccessControlAllowOrigin},
+		AllowMethods: []string{http.MethodOptions, http.MethodConnect, http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete},
 	}))
 
 	port := os.Getenv("PORT")
