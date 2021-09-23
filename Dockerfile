@@ -2,12 +2,15 @@
 FROM golang:1.16.8 
 WORKDIR /app
 COPY . .
-RUN ls
+
+# Kagami/go-face dependencies
 RUN apt-get update && apt-get install -y
 RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 #RUN apt-get install libjpeg-turbo8-dev -y # heroku can't find this package
 #RUN apt-get install libjpeg62-turbo-dev -y
+
 RUN go mod download
+RUN go get -d -v ./...
 
 #ENV DB_URI_CLOUD=
 ENV DB_NAME=db_goface_api_echo
@@ -17,10 +20,7 @@ RUN go build -o /docker-app
 CMD [ "/docker-app" ]
 
 
-
-
-
-
+# CMD [ "go","run","main.go" ] # run without go build
 
 
 
