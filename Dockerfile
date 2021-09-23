@@ -13,14 +13,15 @@ RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 #RUN apt-get install libjpeg62-turbo-dev -y
 
 RUN go mod download
-RUN go get -d -v ./...
+
+
+# RUN go get -d -v ./...
 # RUN go build -o /docker-app
-
-
 # CMD [ "/docker-app" ]
 
 
-CMD [ "go","run","main.go" ] # run without go build
+# run without go build
+CMD [ "go","run","main.go","-p","$PORT" ] 
 
 
 

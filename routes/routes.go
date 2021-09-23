@@ -10,7 +10,7 @@ import (
 func Init(e *echo.Echo, h handler.Handler) {
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, map[string]string{
-			"message": "see?",
+			"message": "goface-api up",
 		})
 	})
 
