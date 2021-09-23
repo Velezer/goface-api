@@ -16,12 +16,12 @@ RUN go mod download
 
 
 # RUN go get -d -v ./...
-# RUN go build -o /docker-app
-# CMD [ "/docker-app" ]
-
+RUN go build -o /docker-app
+CMD [ "/docker-app" ]
+ENTRYPOINT ["/docker-app"]
 
 # run without go build
-CMD [ "go","run","main.go","-p","$PORT" ] 
+# CMD [ "go","run","main.go","-p","$PORT" ] 
 
 
 
