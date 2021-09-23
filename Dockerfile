@@ -12,7 +12,9 @@ RUN go mod download
 #ENV DB_URI_CLOUD=
 ENV DB_NAME=db_goface_api_echo
 
-CMD [ "go","run","main.go" ]
+RUN go build -o /docker-app
+
+CMD [ "/docker-app" ]
 
 
 
