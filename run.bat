@@ -1,3 +1,3 @@
-go run D:\Users\Ace\Desktop\golang\goface-api\main.go
+go run main.go
 
 @pause

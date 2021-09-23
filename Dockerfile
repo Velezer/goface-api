@@ -1,0 +1,40 @@
+
+FROM golang:1.16.8 
+COPY . /app/.
+RUN apt-get update && apt-get install -y
+RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev libjpeg-turbo8-dev -y
+RUN go get -d -v ./...
+
+CMD [ "go","run","main.go" ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#build stage
+# FROM golang:alpine AS builder
+# RUN apk add --no-cache git
+# WORKDIR /go/src/app
+# COPY . .
+# RUN go get -d -v ./...
+# RUN go build -o /go/bin/app -v ./...
+
+# #final stage
+# FROM alpine:latest
+# RUN apk --no-cache add ca-certificates
+# COPY --from=builder /go/bin/app /app
+# ENTRYPOINT /app
+# LABEL Name=gofaceapi Version=0.0.1
+# EXPOSE 3000
