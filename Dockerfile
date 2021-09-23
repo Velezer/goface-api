@@ -12,11 +12,12 @@ RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 RUN apt-get install libjpeg62-turbo-dev -y
 
 RUN go mod download
-RUN ls
-RUN go build main.go
-RUN ls
 
-ENTRYPOINT ./bin
+RUN go build -o /go/bin/app main.go
+COPY /go/bin/app /app
+
+ENTRYPOINT /app
+# ENTRYPOINT /go/bin/app
 
 
 
