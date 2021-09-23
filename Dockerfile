@@ -14,7 +14,7 @@ RUN apt-get install libjpeg62-turbo-dev -y
 RUN go mod download
 
 RUN go build -o /go/bin/app main.go
-COPY /go/bin/app /app
+COPY /go/app /app
 
 ENTRYPOINT /app
 # ENTRYPOINT /go/bin/app
