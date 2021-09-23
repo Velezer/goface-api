@@ -16,7 +16,6 @@ const DataDir = "."
 
 var (
 	ModelDir   = filepath.Join(DataDir, "dat_models")
-	ImagesDir  = filepath.Join(DataDir, "images")
 	EncodedDir = filepath.Join(DataDir, "encoded")
 )
 

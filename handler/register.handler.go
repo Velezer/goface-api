@@ -7,7 +7,6 @@ import (
 	"goface-api/response"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -36,12 +35,11 @@ func prepModelFace(c echo.Context, h Handler, input inputValidation) (models.Fac
 		return models.Face{}, err
 	}
 
-	folderSaved := filepath.Join(helper.ImagesDir, input.Name+"_"+input.Id)
 	filename := time.Now().Local().String() + ".jpg"
 	filename = strings.Replace(filename, ":", "_", -1)
-	helper.SaveFile(folderSaved, filename, content)
+	helper.SaveFile(helper.DataDir, filename, content)
 
-	knownFaces, err := helper.RecognizeFile(h.Rec, folderSaved, filename)
+	knownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, filename)
 	if err != nil {
 		return models.Face{}, err
 	}
