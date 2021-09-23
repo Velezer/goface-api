@@ -16,7 +16,6 @@ RUN go mod download
 
 
 RUN go build -o /docker-app
-CMD [ "/docker-app" ]
 ENTRYPOINT ["/docker-app"]
 
 
