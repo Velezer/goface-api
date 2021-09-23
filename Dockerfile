@@ -17,8 +17,8 @@ RUN apt-get install libjpeg-turbo8-dev -y
 RUN go mod download
 
 RUN go build -o /go/bin/app -v ./...
-COPY --from=builder /go/bin/app /app
-ENTRYPOINT /app
+
+ENTRYPOINT /go/bin/app
 
 
 
