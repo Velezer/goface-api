@@ -54,7 +54,7 @@ func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face
 // }
 
 func SaveFile(dir string, filename string, content multipart.File) {
-	os.Mkdir(dir, os.ModeDir)
+	os.MkdirAll(dir, os.ModeDir)
 	destination, _ := os.Create(filepath.Join(dir, filename))
 	defer destination.Close()
 	io.Copy(destination, content)
