@@ -14,9 +14,9 @@ RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 
 RUN go mod download
 
-
-RUN go build -o /docker-app
 ENTRYPOINT ["/docker-app"]
+
+CMD [ "go","run","main.go","-p","$PORT" ] 
 
 
 
