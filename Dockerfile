@@ -8,11 +8,8 @@ COPY . .
 RUN apt-get update && apt-get install -y
 RUN apt-get install libdlib-dev libblas-dev libatlas-base-dev liblapack-dev -y
 
-# heroku can't find this ubuntu package
-RUN apt-get install libjpeg-turbo8-dev -y 
-
 # the debian package version of libjpeg-turbo8-dev
-#RUN apt-get install libjpeg62-turbo-dev -y
+RUN apt-get install libjpeg62-turbo-dev -y
 
 RUN go mod download
 
