@@ -41,16 +41,21 @@ func main() {
 	h := handler.Handler{Rec: rec, DB: db}
 	e := echo.New()
 
-	
+	// e.Debug = true
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		c.Logger().Error(err)
+
+		e.DefaultHTTPErrorHandler(err, c)
+	}
+
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.HeaderAccessControlAllowOrigin},
 		AllowMethods: []string{http.MethodOptions, http.MethodConnect, http.MethodPost, http.MethodGet, http.MethodHead, http.MethodPut, http.MethodDelete},
 	}))
-	
+
 	routes.Init(e, h)
 
-	
 	port := os.Getenv("PORT")
 	e.Logger.Fatal(e.Start(":" + port))
 

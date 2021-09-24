@@ -56,23 +56,19 @@ func prepModelFace(c echo.Context, h Handler, input inputValidation) (models.Fac
 func (h Handler) Register(c echo.Context) error {
 	input, err := prepInputValidation(c)
 	if err != nil {
-		log.Println(helper.ParseValidationErrors(err))
-		return c.JSON(http.StatusBadRequest, helper.ParseValidationErrors(err))
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	log.Println("register input ", input)
 	modelFace, err := prepModelFace(c, h, input)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	res, err := modelFace.InsertOne(context.Background(), h.DB)
 	if mongo.IsDuplicateKeyError(err) {
-		log.Println(err)
-		return c.JSON(http.StatusConflict, err)
+		return echo.NewHTTPError(http.StatusConflict, err.Error())
 	} else if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	log.Println("Insert data success ", res)
@@ -86,30 +82,26 @@ func (h Handler) Register(c echo.Context) error {
 func (h Handler) RegisterPatch(c echo.Context) error {
 	input, err := prepInputValidation(c)
 	if err != nil {
-		log.Println(helper.ParseValidationErrors(err))
-		return c.JSON(http.StatusBadRequest, helper.ParseValidationErrors(err))
+		return err
 	}
 
 	modelFace, err := prepModelFace(c, h, input)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	res, _ := modelFace.FindById(context.Background(), h.DB)
 	if len(res) == 0 || err != nil {
 		if err != nil {
-			log.Println(err)
-			return c.JSON(http.StatusInternalServerError, err.Error())
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		log.Println("id " + modelFace.Id + " not found")
-		return c.JSON(http.StatusNotFound, response.Response{Error: "id " + modelFace.Id + " not found"})
+		return echo.NewHTTPError(http.StatusNotFound, "id "+modelFace.Id+" not found")
 	}
 
 	_, err = modelFace.PushDescriptor(context.Background(), h.DB)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	log.Println("Sukses menambahkan descriptor wajah ", modelFace.Name, modelFace.Id)

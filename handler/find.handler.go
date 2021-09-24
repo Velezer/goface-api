@@ -18,7 +18,7 @@ func (h Handler) Find(c echo.Context) error {
 	content, err := getFileContent(c, "file")
 	if err != nil {
 		log.Println("file error:", err)
-		return c.JSON(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	helper.SaveFile(helper.DataDir, "unknown.jpg", content)
@@ -26,7 +26,7 @@ func (h Handler) Find(c echo.Context) error {
 	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, "unknown.jpg")
 	if err != nil {
 		log.Println("recognize file error:", err)
-		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	modelFace := models.Face{}
@@ -34,7 +34,7 @@ func (h Handler) Find(c echo.Context) error {
 	samples, err := modelFace.FindAll(context.Background(), h.DB)
 	if err != nil {
 		log.Println("db error", err)
-		return c.JSON(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	dSlice := response.DetectedSlice{}
 	dSlice.FillSortDetectedFromDB(unknownFaces[0].Descriptor, samples, 0.25)

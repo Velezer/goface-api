@@ -2,11 +2,9 @@ package handler
 
 import (
 	"context"
-	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/mymiddleware"
 	"goface-api/response"
-	"log"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -19,29 +17,23 @@ func (h Handler) JWTLogin(c echo.Context) error {
 	modelAdmin := models.Admin{}
 	err := c.Bind(&modelAdmin)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-
-	log.Println(modelAdmin.Username, "login jwt")
 
 	v := validator.New()
 	err = v.Struct(modelAdmin)
 	if err != nil {
-		log.Println(helper.ParseValidationErrors(err))
-		return c.JSON(http.StatusBadRequest, helper.ParseValidationErrors(err))
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	res, err := modelAdmin.FindOneByID(context.Background(), h.DB) // _id equal username
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(modelAdmin.Password))
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusBadRequest, response.Response{Error: err.Error()})
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	claims := mymiddleware.Claims
@@ -50,7 +42,7 @@ func (h Handler) JWTLogin(c echo.Context) error {
 
 	t, err := token.SignedString([]byte("rahasia"))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
@@ -62,29 +54,25 @@ func (h Handler) JWTRegister(c echo.Context) error {
 	modelAdmin := models.Admin{}
 	err := c.Bind(&modelAdmin)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	log.Println("registering", modelAdmin)
+
 	v := validator.New()
 	err = v.Struct(modelAdmin)
 	if err != nil {
-		log.Println(helper.ParseValidationErrors(err))
-		return c.JSON(http.StatusBadRequest, helper.ParseValidationErrors(err))
+		return err
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(modelAdmin.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, response.Response{Error: err.Error()})
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	modelAdmin.Password = string(hashed)
 
 	_, err = modelAdmin.InsertOne(context.Background(), h.DB)
 	if err != nil {
-		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, response.Response{
