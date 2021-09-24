@@ -8,11 +8,7 @@ import (
 )
 
 func Init(e *echo.Echo, h handler.Handler) {
-	e.GET("/", func(c echo.Context) error {
-		return c.JSON(200, map[string]string{
-			"message": "goface-api up",
-		})
-	})
+	e.GET("/", h.Home)
 
 	e.POST("api/face/find", h.Find, mymiddleware.JWTAuth)
 	e.POST("api/face/register", h.Register, mymiddleware.JWTAuth)
