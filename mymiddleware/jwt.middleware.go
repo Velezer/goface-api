@@ -1,6 +1,7 @@
 package mymiddleware
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -12,6 +13,6 @@ var Claims = &jwt.StandardClaims{
 }
 
 var JWTAuth = middleware.JWTWithConfig(middleware.JWTConfig{
-	SigningKey: []byte("rahasia"),
+	SigningKey: []byte(os.Getenv("JWT_KEY")),
 	Claims:     Claims,
 })

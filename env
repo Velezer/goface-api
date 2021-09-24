@@ -2,5 +2,6 @@ DB_URI_CLOUD=
 DB_URI_LOCAL=mongodb://localhost:27017
 
 DB_NAME=db_goface_api_echo
+JWT_KEY=rahasia
 
 PORT=8000
