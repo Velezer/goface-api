@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/response"
@@ -29,7 +28,7 @@ func prepInputValidation(c echo.Context) (inputValidation, error) {
 	return input, nil
 }
 
-func prepModelFace(c echo.Context, h Handler, input inputValidation) (models.Face, error) {
+func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face, error) {
 	content, err := getFileContent(c, "file")
 	if err != nil {
 		return models.Face{}, err
@@ -44,13 +43,13 @@ func prepModelFace(c echo.Context, h Handler, input inputValidation) (models.Fac
 		return models.Face{}, err
 	}
 
-	modelFace := models.Face{
+	faceData := models.Face{
 		Id:          input.Id,
 		Name:        input.Name,
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	return modelFace, nil
+	return faceData, nil
 }
 
 func (h Handler) Register(c echo.Context) error {
@@ -59,23 +58,26 @@ func (h Handler) Register(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	log.Println("register input ", input)
-	modelFace, err := prepModelFace(c, h, input)
+	faceData, err := prepFaceData(c, h, input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	res, err := modelFace.InsertOne(context.Background(), h.DB)
+	repo := models.RepoFace{
+		Collection: h.DB.CollFace,
+	}
+	err = repo.InsertOne(faceData)
 	if mongo.IsDuplicateKeyError(err) {
 		return echo.NewHTTPError(http.StatusConflict, err.Error())
 	} else if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	log.Println("Insert data success ", res)
+	log.Println("Insert data success ")
 
 	return c.JSON(http.StatusCreated, response.Response{
 		Detail: "Sukses menambahkan wajah",
-		Data:   modelFace,
+		Data:   faceData,
 	})
 }
 
@@ -85,29 +87,31 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return err
 	}
 
-	modelFace, err := prepModelFace(c, h, input)
+	faceData, err := prepFaceData(c, h, input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
-	res, _ := modelFace.FindById(context.Background(), h.DB)
+	repo := models.RepoFace{
+		Collection: h.DB.CollFace,
+	}
+	res, _ := repo.FindById(faceData.Id)
 	if len(res) == 0 || err != nil {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
-		log.Println("id " + modelFace.Id + " not found")
-		return echo.NewHTTPError(http.StatusNotFound, "id "+modelFace.Id+" not found")
+		log.Println("id " + faceData.Id + " not found")
+		return echo.NewHTTPError(http.StatusNotFound, "id "+faceData.Id+" not found")
 	}
 
-	_, err = modelFace.PushDescriptor(context.Background(), h.DB)
+	_, err = repo.PushDescriptor(faceData.Id, faceData.Descriptors[0])
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	log.Println("Sukses menambahkan descriptor wajah ", modelFace.Name, modelFace.Id)
+	log.Println("Sukses menambahkan descriptor wajah ", faceData.Name, faceData.Id)
 
 	return c.JSON(http.StatusOK, response.Response{
-		Detail: "Sukses menambahkan descriptor wajah " + modelFace.Name,
-		Data:   modelFace,
+		Detail: "Sukses menambahkan descriptor wajah " + faceData.Name,
+		Data:   faceData,
 	})
 }

@@ -8,59 +8,56 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const collectionFace string = "coll_face"
-
 type Face struct {
 	Id          string            `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name        string            `json:"name,omitempty" bson:"name,omitempty"`
 	Descriptors []face.Descriptor `json:"descriptors,omitempty" bson:"descriptors,omitempty"`
 }
 
-func (face Face) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
-	coll := db.Collection(collectionFace)
-	res, err := coll.InsertOne(ctx, face)
+type RepoFace struct {
+	Collection *mongo.Collection
+}
+
+func (repo RepoFace) InsertOne(face Face) error {
+	_, err := repo.Collection.InsertOne(context.Background(), face)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo RepoFace) PushDescriptor(id string, descriptor face.Descriptor) (*mongo.UpdateResult, error) {
+	res, err := repo.Collection.UpdateByID(context.Background(), id, bson.M{"$push": bson.M{"descriptors": descriptor}})
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (face Face) PushDescriptor(ctx context.Context, db *mongo.Database) (*mongo.UpdateResult, error) {
-	coll := db.Collection(collectionFace)
-	res, err := coll.UpdateByID(ctx, face.Id, bson.M{"$push": bson.M{"descriptors": face.Descriptors[0]}})
+func (repo RepoFace) FindById(id string) (res []Face, err error) {
+	cursor, err := repo.Collection.Find(context.Background(), bson.M{"_id": id})
 	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(context.Background(), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (face Face) FindById(ctx context.Context, db *mongo.Database) (res []Face, err error) {
-	coll := db.Collection(collectionFace)
-	cursor, err := coll.Find(ctx, bson.M{"_id": face.Id})
+func (repo RepoFace) FindAll() (res []Face, err error) {
+	cursor, err := repo.Collection.Find(context.Background(), bson.M{})
 	if err != nil {
 		return nil, err
 	}
-	if err = cursor.All(ctx, &res); err != nil {
+	if err = cursor.All(context.Background(), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (face Face) FindAll(ctx context.Context, db *mongo.Database) (res []Face, err error) {
-	coll := db.Collection(collectionFace)
-	cursor, err := coll.Find(ctx, bson.M{})
-	if err != nil {
-		return nil, err
-	}
-	if err = cursor.All(ctx, &res); err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (face Face) DeleteId(ctx context.Context, db *mongo.Database) (*mongo.DeleteResult, error) {
-	coll := db.Collection(collectionFace)
-	res, err := coll.DeleteOne(ctx, bson.M{"_id": face.Id})
+func (repo RepoFace) DeleteId(id string) (*mongo.DeleteResult, error) {
+	res, err := repo.Collection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
 		return nil, err
 	}

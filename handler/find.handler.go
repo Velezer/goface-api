@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/response"
@@ -29,9 +28,10 @@ func (h Handler) Find(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	modelFace := models.Face{}
-
-	samples, err := modelFace.FindAll(context.Background(), h.DB)
+	repo:=models.RepoFace{
+		Collection: h.DB.CollFace,
+	}
+	samples, err := repo.FindAll()
 	if err != nil {
 		log.Println("db error", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())

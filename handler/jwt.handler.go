@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"goface-api/models"
 	"goface-api/mymiddleware"
 	"goface-api/response"
@@ -14,24 +13,28 @@ import (
 )
 
 func (h Handler) JWTLogin(c echo.Context) error {
-	modelAdmin := models.Admin{}
-	err := c.Bind(&modelAdmin)
+	adminData := models.Admin{}
+	err := c.Bind(&adminData)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	v := validator.New()
-	err = v.Struct(modelAdmin)
+	err = v.Struct(adminData)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	res, err := modelAdmin.FindOneByID(context.Background(), h.DB) // _id equal username
+	repo:=models.RepoAdmin{
+		Collection: h.DB.CollAdmin,
+	}
+
+	res, err := repo.FindOneByID(adminData.Username) // username equal _id
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(modelAdmin.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(adminData.Password))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -51,26 +54,29 @@ func (h Handler) JWTLogin(c echo.Context) error {
 }
 
 func (h Handler) JWTRegister(c echo.Context) error {
-	modelAdmin := models.Admin{}
-	err := c.Bind(&modelAdmin)
+	adminData := models.Admin{}
+	err := c.Bind(&adminData)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	v := validator.New()
-	err = v.Struct(modelAdmin)
+	err = v.Struct(adminData)
 	if err != nil {
 		return err
 	}
 
-	hashed, err := bcrypt.GenerateFromPassword([]byte(modelAdmin.Password), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(adminData.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	modelAdmin.Password = string(hashed)
+	adminData.Password = string(hashed)
 
-	_, err = modelAdmin.InsertOne(context.Background(), h.DB)
+	repo:=models.RepoAdmin{
+		Collection: h.DB.CollAdmin,
+	}
+	err = repo.InsertOne(adminData)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

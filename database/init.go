@@ -12,7 +12,12 @@ import (
 )
 
 
-func InitDB() *mongo.Database {
+type DBColls struct{
+	CollAdmin *mongo.Collection
+	CollFace *mongo.Collection
+}
+
+func InitDB() *DBColls {
 	conf := config.GetDBConfig()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -28,6 +33,12 @@ func InitDB() *mongo.Database {
 		log.Panicln(err)
 	}
 
-	DB := client.Database(conf.DB_NAME)
-	return DB
+	db := client.Database(conf.DB_NAME)
+	dbColls:=DBColls{
+		CollAdmin: db.Collection("coll_admin"),
+		CollFace: db.Collection("coll_face"),
+	}
+	return &dbColls
 }
+
+

@@ -7,28 +7,29 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const collectionAdmin string = "coll_admin"
-
 type Admin struct {
-	Username string `bson:"_id" form:"username" validate:"required"`
-	Password string `bson:"password" form:"password" validate:"required"`
+	Username string `bson:"_id" form:"username" json:"username" validate:"required"`
+	Password string `bson:"password" form:"password" json:"password" validate:"required"`
 }
 
-func (admin Admin) InsertOne(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
-	coll := db.Collection(collectionAdmin)
-	res, err := coll.InsertOne(ctx, admin)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+
+type RepoAdmin struct {
+	Collection *mongo.Collection
 }
 
-func (admin Admin) FindOneByID(ctx context.Context, db *mongo.Database) (res Admin, err error) {
-	coll := db.Collection(collectionAdmin)
-	cursor := coll.FindOne(ctx, bson.M{"_id": admin.Username})
+func (repo *RepoAdmin) FindOneByID(id string) (res Admin, err error) {
+	cursor := repo.Collection.FindOne(context.Background(), bson.M{"_id": id})
 
 	if err = cursor.Decode(&res); err != nil {
 		return res, err
 	}
 	return res, nil
+}
+
+func (repo *RepoAdmin) InsertOne(admin Admin) error {
+	_, err := repo.Collection.InsertOne(context.Background(), admin)
+	if err != nil {
+		return err
+	}
+	return nil
 }

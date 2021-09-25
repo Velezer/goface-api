@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"goface-api/models"
 	"goface-api/response"
 	"log"
@@ -13,8 +12,10 @@ import (
 func (h Handler) Delete(c echo.Context) error {
 	id := c.Param("id")
 
-	modelFace := models.Face{Id: id}
-	res, err := modelFace.DeleteId(context.Background(), h.DB)
+	repo := models.RepoFace{
+		Collection: h.DB.CollFace,
+	}
+	res, err := repo.DeleteId(id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -27,8 +28,10 @@ func (h Handler) Delete(c echo.Context) error {
 }
 
 func (h Handler) FaceAll(c echo.Context) error {
-	modelFace := models.Face{}
-	faces, err := modelFace.FindAll(context.Background(), h.DB)
+	repo := models.RepoFace{
+		Collection: h.DB.CollFace,
+	}
+	faces, err := repo.FindAll()
 	if err != nil {
 		log.Println("FindAll error:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -43,8 +46,11 @@ func (h Handler) FaceAll(c echo.Context) error {
 }
 
 func (h Handler) FaceId(c echo.Context) error {
-	modelFace := models.Face{Id: c.Param("id")}
-	faces, err := modelFace.FindById(context.Background(), h.DB)
+	id := c.Param("id")
+	repo := models.RepoFace{
+		Collection: h.DB.CollFace,
+	}
+	faces, err := repo.FindById(id)
 	if err != nil {
 		log.Println("FindById error:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
