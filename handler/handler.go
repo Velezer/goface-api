@@ -2,6 +2,7 @@ package handler
 
 import (
 	"goface-api/database"
+	"goface-api/mymock"
 	"mime/multipart"
 
 	"github.com/Kagami/go-face"
@@ -11,6 +12,7 @@ import (
 type Handler struct {
 	Rec *face.Recognizer
 	DBRepo  *database.DBRepo
+	Bcrypt mymock.BcryptIface
 }
 
 type inputValidation struct {

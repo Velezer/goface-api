@@ -35,7 +35,7 @@ func InitDB() *DBRepo {
 
 	db := client.Database(conf.DB_NAME)
 	dbrepo := DBRepo{
-		RepoAdmin: &models.RepoAdmin{Collection: db.Collection("coll_admin")},
+		RepoAdmin: models.RepoAdmin{Collection: db.Collection("coll_admin")},
 		RepoFace:  models.RepoFace{Collection: db.Collection("coll_face")},
 	}
 	return &dbrepo

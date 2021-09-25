@@ -7,7 +7,7 @@ import (
 
 type RepositoryAdminIface interface {
 	FindOneByID(id string) (res Admin, err error)
-	InsertOne(admin Admin) error
+	InsertOne(admin Admin) (err error)
 }
 
 type RepositoryFaceIface interface {

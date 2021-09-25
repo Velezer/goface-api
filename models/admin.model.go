@@ -17,7 +17,7 @@ type RepoAdmin struct {
 	Collection *mongo.Collection
 }
 
-func (repo *RepoAdmin) FindOneByID(id string) (res Admin, err error) {
+func (repo RepoAdmin) FindOneByID(id string) (res Admin, err error) {
 	cursor := repo.Collection.FindOne(context.Background(), bson.M{"_id": id})
 
 	if err = cursor.Decode(&res); err != nil {
@@ -26,7 +26,7 @@ func (repo *RepoAdmin) FindOneByID(id string) (res Admin, err error) {
 	return res, nil
 }
 
-func (repo *RepoAdmin) InsertOne(admin Admin) error {
+func (repo RepoAdmin) InsertOne(admin Admin) error {
 	_, err := repo.Collection.InsertOne(context.Background(), admin)
 	if err != nil {
 		return err
