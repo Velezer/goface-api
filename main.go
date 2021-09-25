@@ -34,11 +34,11 @@ func releaseResource() {
 }
 
 func main() {
-	db := database.InitDB()
+	dbrepo := database.InitDB()
 	initRecognizer()
 	defer releaseResource()
 
-	h := handler.Handler{Rec: rec, DB: db}
+	h := handler.Handler{Rec: rec, DBRepo: dbrepo}
 	e := echo.New()
 
 	// e.Debug = true

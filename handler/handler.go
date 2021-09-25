@@ -10,7 +10,7 @@ import (
 
 type Handler struct {
 	Rec *face.Recognizer
-	DB  *database.DBColls
+	DBRepo  *database.DBRepo
 }
 
 type inputValidation struct {

@@ -5,6 +5,7 @@ import (
 	"goface-api/mymiddleware"
 	"goface-api/response"
 	"net/http"
+	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
@@ -25,10 +26,7 @@ func (h Handler) JWTLogin(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	repo:=models.RepoAdmin{
-		Collection: h.DB.CollAdmin,
-	}
-
+	repo := h.DBRepo.RepoAdmin
 	res, err := repo.FindOneByID(adminData.Username) // username equal _id
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -43,7 +41,7 @@ func (h Handler) JWTLogin(c echo.Context) error {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	t, err := token.SignedString([]byte("rahasia"))
+	t, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -73,9 +71,7 @@ func (h Handler) JWTRegister(c echo.Context) error {
 
 	adminData.Password = string(hashed)
 
-	repo:=models.RepoAdmin{
-		Collection: h.DB.CollAdmin,
-	}
+	repo := h.DBRepo.RepoAdmin
 	err = repo.InsertOne(adminData)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

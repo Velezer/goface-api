@@ -63,9 +63,7 @@ func (h Handler) Register(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	repo := models.RepoFace{
-		Collection: h.DB.CollFace,
-	}
+	repo := h.DBRepo.RepoFace
 	err = repo.InsertOne(faceData)
 	if mongo.IsDuplicateKeyError(err) {
 		return echo.NewHTTPError(http.StatusConflict, err.Error())
@@ -91,9 +89,7 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	repo := models.RepoFace{
-		Collection: h.DB.CollFace,
-	}
+	repo := h.DBRepo.RepoFace
 	res, _ := repo.FindById(faceData.Id)
 	if len(res) == 0 || err != nil {
 		if err != nil {

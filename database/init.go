@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"goface-api/config"
+	"goface-api/models"
 	"log"
 	"time"
 
@@ -11,13 +12,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-
-type DBColls struct{
-	CollAdmin *mongo.Collection
-	CollFace *mongo.Collection
+type DBRepo struct {
+	RepoAdmin models.RepositoryAdminIface
+	RepoFace  models.RepositoryFaceIface
 }
 
-func InitDB() *DBColls {
+func InitDB() *DBRepo {
 	conf := config.GetDBConfig()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -34,11 +34,9 @@ func InitDB() *DBColls {
 	}
 
 	db := client.Database(conf.DB_NAME)
-	dbColls:=DBColls{
-		CollAdmin: db.Collection("coll_admin"),
-		CollFace: db.Collection("coll_face"),
+	dbrepo := DBRepo{
+		RepoAdmin: &models.RepoAdmin{Collection: db.Collection("coll_admin")},
+		RepoFace:  models.RepoFace{Collection: db.Collection("coll_face")},
 	}
-	return &dbColls
+	return &dbrepo
 }
-
-
