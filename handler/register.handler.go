@@ -31,19 +31,19 @@ func prepInputValidation(c echo.Context) (inputValidation, error) {
 	return input, nil
 }
 
-func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face, error) {
+func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face, int, error) {
 	content, err := getFileContent(c, "file")
 	if err != nil {
-		return models.Face{}, err
+		return models.Face{}, 500, err
 	}
 
 	filename := time.Now().Local().String() + ".jpg"
 	filename = strings.Replace(filename, ":", "_", -1)
 	helper.SaveFile(helper.BaseDir, filename, content)
 
-	knownFaces, err := helper.RecognizeFile(h.Rec, helper.BaseDir, filename)
+	knownFaces, code, err := helper.RecognizeFile(h.Rec, helper.BaseDir, filename)
 	if err != nil {
-		return models.Face{}, err
+		return models.Face{}, code, err
 	}
 
 	faceData := models.Face{
@@ -52,7 +52,7 @@ func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	return faceData, nil
+	return faceData, 200, nil
 }
 
 func (h Handler) Register(c echo.Context) error {
@@ -61,9 +61,9 @@ func (h Handler) Register(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	log.Println("register input ", input)
-	faceData, err := prepFaceData(c, h, input)
+	faceData, code, err := prepFaceData(c, h, input)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(code, err.Error())
 	}
 
 	repo := h.DBRepo.RepoFace
@@ -88,9 +88,9 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	faceData, err := prepFaceData(c, h, input)
+	faceData, code, err := prepFaceData(c, h, input)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(code, err.Error())
 	}
 	repo := h.DBRepo.RepoFace
 	res, err := repo.FindById(faceData.Id)

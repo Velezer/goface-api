@@ -13,25 +13,25 @@ import (
 const BaseDir = "."
 
 var (
-	ModelDir    = filepath.Join(BaseDir, "dat_models")
-	EncodedDir  = filepath.Join(BaseDir, "encoded")
+	ModelDir   = filepath.Join(BaseDir, "dat_models")
+	EncodedDir = filepath.Join(BaseDir, "encoded")
 )
 
-func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face.Face, error) {
+func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face.Face, int, error) {
 	knownFaces, err := rec.RecognizeFile(filepath.Join(folder, filename))
 	os.Remove(filepath.Join(folder, filename))
 	if err != nil {
-		return nil, err
+		return nil, 500, err
 	}
 	if len(knownFaces) > 1 {
 		err = errors.New("detected more than one face, only support one face")
-		return nil, err
+		return nil, 400, err
 	}
 	if len(knownFaces) == 0 {
 		err = errors.New("no face detected")
-		return nil, err
+		return nil, 400, err
 	}
-	return knownFaces, err
+	return knownFaces, 200, err
 }
 
 func SaveFile(dir string, filename string, content multipart.File) error {

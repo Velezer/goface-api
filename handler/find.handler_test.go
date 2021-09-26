@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"errors"
 	"goface-api/database"
 	"goface-api/helper"
 	"goface-api/models"
@@ -19,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandler_Find_ValidationError(t *testing.T) {
+func TestHandler_Find_NoFile(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
@@ -68,4 +69,39 @@ func TestHandler_Find_Happy(t *testing.T) {
 	if assert.NoError(t, h.Find(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
+}
+func TestHandler_Find_FindAllErr(t *testing.T) {
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	assert.NoError(t, err)
+
+	content, err := os.Open("../test/test_happy.jpg")
+	assert.NoError(t, err)
+
+	_, err = io.Copy(formFile, content) // copy content to formFile
+	assert.NoError(t, err)
+	assert.NoError(t, writer.Close())
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	assert.NoError(t, err)
+
+	repo := new(mymock.MockRepoFace)
+	repo.On("FindAll").Return([]models.Face{}, errors.New("FindAllErr"))
+
+	dbRepo := database.DBRepo{
+		RepoFace: repo,
+	}
+
+	h := Handler{Rec: reco, DBRepo: &dbRepo}
+
+	// Assertions
+	assert.Error(t, h.Find(c), "FindAllErr")
 }

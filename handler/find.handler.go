@@ -23,9 +23,9 @@ func (h Handler) Find(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.BaseDir, "unknown.jpg")
+	unknownFaces, code, err := helper.RecognizeFile(h.Rec, helper.BaseDir, "unknown.jpg")
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(code, err.Error())
 	}
 
 	repo := h.DBRepo.RepoFace
