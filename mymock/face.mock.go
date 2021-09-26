@@ -13,7 +13,8 @@ type MockRepoFace struct {
 }
 
 func (repo MockRepoFace) InsertOne(face models.Face) error {
-	return nil
+	args := repo.Called(face)
+	return args.Error(0)
 }
 
 func (repo MockRepoFace) PushDescriptor(id string, descriptor face.Descriptor) (*mongo.UpdateResult, error) {
