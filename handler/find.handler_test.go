@@ -33,18 +33,16 @@ func TestHandler_Find_ValidationError(t *testing.T) {
 }
 
 func TestHandler_Find_Happy(t *testing.T) {
-	path := "../test/test_happy.jpg"
-
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 
-	part, err := writer.CreateFormFile("file", path)
+	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
 	assert.NoError(t, err)
 
-	sample, err := os.Open(path)
+	content, err := os.Open("../test/test_happy.jpg")
 	assert.NoError(t, err)
 
-	_, err = io.Copy(part, sample)
+	_, err = io.Copy(formFile, content) // copy content to formFile
 	assert.NoError(t, err)
 	assert.NoError(t, writer.Close())
 
@@ -57,7 +55,6 @@ func TestHandler_Find_Happy(t *testing.T) {
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
-
 	repo := new(mymock.MockRepoFace)
 	repo.On("FindAll").Return([]models.Face{}, nil)
 
@@ -65,8 +62,10 @@ func TestHandler_Find_Happy(t *testing.T) {
 		RepoFace: repo,
 	}
 
-	h := Handler{Rec: reco,DBRepo: &dbRepo}
+	h := Handler{Rec: reco, DBRepo: &dbRepo}
 
 	// Assertions
-	assert.NoError(t, h.Find(c))
+	if assert.NoError(t, h.Find(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+	}
 }
