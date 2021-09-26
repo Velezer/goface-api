@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func TestHandler_JWTLogin(t *testing.T) {
+func TestHandler_JWTLogin_Happy(t *testing.T) {
 	reqJSON := `{"username":"krefa","password":"krefa"}`
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/jwt/login", strings.NewReader(reqJSON))
@@ -42,8 +42,20 @@ func TestHandler_JWTLogin(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
+func TestHandler_JWTLogin_ValidationError(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/jwt/login", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
 
-func TestHandler_JWTRegister(t *testing.T) {
+	h := Handler{}
+
+	// Assertions
+	assert.Error(t, h.JWTLogin(c))
+}
+
+func TestHandler_JWTRegister_Happy(t *testing.T) {
 	reqJSON := `{"username":"krefa","password":"krefa"}`
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/jwt/register", strings.NewReader(reqJSON))
@@ -71,4 +83,17 @@ func TestHandler_JWTRegister(t *testing.T) {
 	if assert.NoError(t, h.JWTRegister(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	}
+}
+
+func TestHandler_JWTRegister_ValidationError(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/jwt/register", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	h := Handler{}
+
+	// Assertions
+	assert.Error(t, h.JWTRegister(c))
 }

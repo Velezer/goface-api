@@ -15,22 +15,22 @@ func (h Handler) Find(c echo.Context) error {
 
 	content, err := getFileContent(c, "file")
 	if err != nil {
-		log.Println("file error:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	helper.SaveFile(helper.DataDir, "unknown.jpg", content)
-
-	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, "unknown.jpg")
+	err = helper.SaveFile(helper.BaseDir, "unknown.jpg", content)
 	if err != nil {
-		log.Println("recognize file error:", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	unknownFaces, err := helper.RecognizeFile(h.Rec, helper.BaseDir, "unknown.jpg")
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	repo := h.DBRepo.RepoFace
 	samples, err := repo.FindAll()
 	if err != nil {
-		log.Println("db error", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	dSlice := response.DetectedSlice{}

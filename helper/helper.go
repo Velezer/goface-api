@@ -12,11 +12,11 @@ import (
 	"github.com/Kagami/go-face"
 )
 
-const DataDir = "."
+const BaseDir = "."
 
 var (
-	ModelDir   = filepath.Join(DataDir, "dat_models")
-	EncodedDir = filepath.Join(DataDir, "encoded")
+	ModelDir    = filepath.Join(BaseDir, "dat_models")
+	EncodedDir  = filepath.Join(BaseDir, "encoded")
 )
 
 func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face.Face, error) {
@@ -36,12 +36,21 @@ func RecognizeFile(rec *face.Recognizer, folder string, filename string) ([]face
 	return knownFaces, err
 }
 
-
-func SaveFile(dir string, filename string, content multipart.File) {
+func SaveFile(dir string, filename string, content multipart.File) error {
 	os.MkdirAll(dir, os.ModeDir)
-	destination, _ := os.Create(filepath.Join(dir, filename))
+
+	destination, err := os.Create(filepath.Join(dir, filename))
 	defer destination.Close()
-	io.Copy(destination, content)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(destination, content)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func OSReadDir(root string, extension string) (dirs []string, files []string) {

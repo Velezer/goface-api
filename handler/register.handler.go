@@ -36,9 +36,9 @@ func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face
 
 	filename := time.Now().Local().String() + ".jpg"
 	filename = strings.Replace(filename, ":", "_", -1)
-	helper.SaveFile(helper.DataDir, filename, content)
+	helper.SaveFile(helper.BaseDir, filename, content)
 
-	knownFaces, err := helper.RecognizeFile(h.Rec, helper.DataDir, filename)
+	knownFaces, err := helper.RecognizeFile(h.Rec, helper.BaseDir, filename)
 	if err != nil {
 		return models.Face{}, err
 	}
