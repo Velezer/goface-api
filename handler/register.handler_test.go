@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandler_Register(t *testing.T) {
+func TestHandler_Register_Happy(t *testing.T) {
 	faceData := models.Face{
 		Id:   "2131256312",
 		Name: "myname",
@@ -73,4 +73,114 @@ func TestHandler_Register(t *testing.T) {
 	if assert.NoError(t, h.Register(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	}
+}
+
+func TestHandler_RegisterPatch_Happy(t *testing.T) {
+	faceData := models.Face{
+		Id:   "2131256312",
+		Name: "myname",
+	}
+
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	assert.NoError(t, err)
+
+	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
+	assert.NoError(t, err)
+	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
+
+	// formfile
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	assert.NoError(t, err)
+
+	content, err := os.Open("../test/test_happy.jpg")
+	assert.NoError(t, err)
+
+	_, err = io.Copy(formFile, content) // copy content to formFile
+	assert.NoError(t, err)
+	assert.NoError(t, writer.Close())
+	// end formfile
+
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
+	req.Form = url.Values{} // set field,value of form
+	req.Form.Set("id", faceData.Id)
+	req.Form.Set("name", faceData.Name)
+
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	repo := new(mymock.MockRepoFace)
+	repo.On("FindById", faceData.Id).Return([]models.Face{faceData}, nil)
+	repo.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(nil)
+
+	dbRepo := database.DBRepo{
+		RepoFace: repo,
+	}
+
+	h := Handler{DBRepo: &dbRepo, Rec: reco}
+	// Assertions
+	if assert.NoError(t, h.RegisterPatch(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+	}
+}
+
+func TestHandler_RegisterPatch_NotFound(t *testing.T) {
+	faceData := models.Face{
+		Id:   "2131256312",
+		Name: "myname",
+	}
+
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	assert.NoError(t, err)
+
+	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
+	assert.NoError(t, err)
+	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
+
+	// formfile
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	assert.NoError(t, err)
+
+	content, err := os.Open("../test/test_happy.jpg")
+	assert.NoError(t, err)
+
+	_, err = io.Copy(formFile, content) // copy content to formFile
+	assert.NoError(t, err)
+	assert.NoError(t, writer.Close())
+	// end formfile
+
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
+	req.Form = url.Values{} // set field,value of form
+	req.Form.Set("id", faceData.Id)
+	req.Form.Set("name", faceData.Name)
+
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	repo := new(mymock.MockRepoFace)
+	repo.On("FindById", faceData.Id).Return([]models.Face{}, nil)
+	repo.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(nil)
+
+	dbRepo := database.DBRepo{
+		RepoFace: repo,
+	}
+
+	h := Handler{DBRepo: &dbRepo, Rec: reco}
+	// Assertions
+	assert.Error(t, h.RegisterPatch(c))
 }

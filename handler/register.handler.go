@@ -21,7 +21,7 @@ func prepInputValidation(c echo.Context) (inputValidation, error) {
 	if err != nil {
 		return input, err
 	}
-	
+
 	v := validator.New()
 	err = v.Struct(input)
 	if err != nil {
@@ -85,7 +85,7 @@ func (h Handler) Register(c echo.Context) error {
 func (h Handler) RegisterPatch(c echo.Context) error {
 	input, err := prepInputValidation(c)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	faceData, err := prepFaceData(c, h, input)
@@ -93,16 +93,15 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	repo := h.DBRepo.RepoFace
-	res, _ := repo.FindById(faceData.Id)
+	res, err := repo.FindById(faceData.Id)
 	if len(res) == 0 || err != nil {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
-		log.Println("id " + faceData.Id + " not found")
 		return echo.NewHTTPError(http.StatusNotFound, "id "+faceData.Id+" not found")
 	}
 
-	_, err = repo.PushDescriptor(faceData.Id, faceData.Descriptors[0])
+	err = repo.PushDescriptor(faceData.Id, faceData.Descriptors[0])
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

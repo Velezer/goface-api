@@ -26,12 +26,12 @@ func (repo RepoFace) InsertOne(face Face) error {
 	return nil
 }
 
-func (repo RepoFace) PushDescriptor(id string, descriptor face.Descriptor) (*mongo.UpdateResult, error) {
-	res, err := repo.Collection.UpdateByID(context.Background(), id, bson.M{"$push": bson.M{"descriptors": descriptor}})
+func (repo RepoFace) PushDescriptor(id string, descriptor face.Descriptor) (error) {
+	_, err := repo.Collection.UpdateByID(context.Background(), id, bson.M{"$push": bson.M{"descriptors": descriptor}})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return res, nil
+	return nil
 }
 
 func (repo RepoFace) FindById(id string) (res []Face, err error) {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/Kagami/go-face"
 	"github.com/stretchr/testify/mock"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type MockRepoFace struct {
@@ -17,8 +16,9 @@ func (repo MockRepoFace) InsertOne(face models.Face) error {
 	return args.Error(0)
 }
 
-func (repo MockRepoFace) PushDescriptor(id string, descriptor face.Descriptor) (*mongo.UpdateResult, error) {
-	return nil, nil
+func (repo MockRepoFace) PushDescriptor(id string, descriptor face.Descriptor) (error) {
+	args := repo.Called(id, descriptor)
+	return args.Error(0)
 }
 
 func (repo MockRepoFace) FindById(id string) (res []models.Face, err error) {

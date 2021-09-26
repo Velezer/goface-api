@@ -1,13 +1,11 @@
 package helper
 
 import (
-	"encoding/json"
 	"errors"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/Kagami/go-face"
 )
@@ -40,10 +38,10 @@ func SaveFile(dir string, filename string, content multipart.File) error {
 	os.MkdirAll(dir, os.ModeDir)
 
 	destination, err := os.Create(filepath.Join(dir, filename))
-	defer destination.Close()
 	if err != nil {
 		return err
 	}
+	defer destination.Close()
 
 	_, err = io.Copy(destination, content)
 	if err != nil {
@@ -53,38 +51,39 @@ func SaveFile(dir string, filename string, content multipart.File) error {
 	return nil
 }
 
-func OSReadDir(root string, extension string) (dirs []string, files []string) {
-	f, _ := os.Open(root)
-	defer f.Close()
+// not being used anymore
+// func OSReadDir(root string, extension string) (dirs []string, files []string) {
+// 	f, _ := os.Open(root)
+// 	defer f.Close()
 
-	fileInfo, _ := f.Readdir(-1)
-	for _, file := range fileInfo {
-		if strings.Contains(file.Name(), extension) {
-			files = append(files, file.Name())
-		}
-		if file.IsDir() {
-			dirs = append(dirs, file.Name())
-		}
-	}
-	return
-}
+// 	fileInfo, _ := f.Readdir(-1)
+// 	for _, file := range fileInfo {
+// 		if strings.Contains(file.Name(), extension) {
+// 			files = append(files, file.Name())
+// 		}
+// 		if file.IsDir() {
+// 			dirs = append(dirs, file.Name())
+// 		}
+// 	}
+// 	return
+// }
 
-func DumpToJson(dir string, filename string, content face.Descriptor) {
-	os.Mkdir(dir, os.ModeDir)
-	file, _ := os.Create(filepath.Join(dir, filename))
-	defer file.Close()
+// func DumpToJson(dir string, filename string, content face.Descriptor) {
+// 	os.Mkdir(dir, os.ModeDir)
+// 	file, _ := os.Create(filepath.Join(dir, filename))
+// 	defer file.Close()
 
-	encoder := json.NewEncoder(file)
-	encoder.Encode(content)
+// 	encoder := json.NewEncoder(file)
+// 	encoder.Encode(content)
 
-}
+// }
 
-func DecodeFromJson(dir string, filename string) (content face.Descriptor) {
-	file, _ := os.Open(filepath.Join(dir, filename))
-	defer file.Close()
+// func DecodeFromJson(dir string, filename string) (content face.Descriptor) {
+// 	file, _ := os.Open(filepath.Join(dir, filename))
+// 	defer file.Close()
 
-	decoder := json.NewDecoder(file)
-	decoder.Decode(&content)
+// 	decoder := json.NewDecoder(file)
+// 	decoder.Decode(&content)
 
-	return content
-}
+// 	return content
+// }

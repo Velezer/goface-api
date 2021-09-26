@@ -10,8 +10,8 @@ import (
 )
 
 type Handler struct {
-	Rec *face.Recognizer
-	DBRepo  *database.DBRepo
+	Rec    *face.Recognizer
+	DBRepo *database.DBRepo
 	Bcrypt mymock.BcryptIface
 }
 
