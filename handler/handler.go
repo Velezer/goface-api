@@ -16,8 +16,8 @@ type Handler struct {
 }
 
 type inputValidation struct {
-	Id   string `form:"id" validate:"required,gte=9,lte=16"`
-	Name string `form:"name" validate:"required"`
+	Id   string `form:"id" json:"id" validate:"required,gte=9,lte=16"`
+	Name string `form:"name" json:"name" validate:"required"`
 }
 
 func getFileContent(c echo.Context, fieldName string) (multipart.File, error) {

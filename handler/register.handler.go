@@ -17,10 +17,13 @@ import (
 
 func prepInputValidation(c echo.Context) (inputValidation, error) {
 	input := inputValidation{}
-	c.Bind(&input)
-
+	err := c.Bind(&input)
+	if err != nil {
+		return input, err
+	}
+	
 	v := validator.New()
-	err := v.Struct(input)
+	err = v.Struct(input)
 	if err != nil {
 		return input, err
 	}
