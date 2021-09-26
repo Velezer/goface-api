@@ -56,10 +56,10 @@ func (repo RepoFace) FindAll() (res []Face, err error) {
 	return res, nil
 }
 
-func (repo RepoFace) DeleteId(id string) (*mongo.DeleteResult, error) {
-	res, err := repo.Collection.DeleteOne(context.Background(), bson.M{"_id": id})
+func (repo RepoFace) DeleteId(id string) (error) {
+	_, err := repo.Collection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return res, nil
+	return nil
 }

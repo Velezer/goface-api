@@ -21,16 +21,16 @@ func (repo MockRepoFace) PushDescriptor(id string, descriptor face.Descriptor) (
 }
 
 func (repo MockRepoFace) FindById(id string) (res []models.Face, err error) {
-	return nil, nil
+	args := repo.Called(id)
+	return args.Get(0).([]models.Face), args.Error(1)
 }
 
 func (repo MockRepoFace) FindAll() (res []models.Face, err error) {
 	args := repo.Called()
-
 	return args.Get(0).([]models.Face), args.Error(1)
 }
 
-func (repo MockRepoFace) DeleteId(id string) (*mongo.DeleteResult, error) {
-
-	return nil, nil
+func (repo MockRepoFace) DeleteId(id string) error {
+	args := repo.Called(id)
+	return args.Error(0)
 }

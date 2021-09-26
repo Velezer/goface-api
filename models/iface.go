@@ -15,5 +15,5 @@ type RepositoryFaceIface interface {
 	PushDescriptor(id string, descriptor face.Descriptor) (*mongo.UpdateResult, error)
 	FindById(id string) (res []Face, err error)
 	FindAll() (res []Face, err error)
-	DeleteId(id string) (*mongo.DeleteResult, error)
+	DeleteId(id string) (error)
 }

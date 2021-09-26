@@ -12,23 +12,20 @@ func (h Handler) Delete(c echo.Context) error {
 	id := c.Param("id")
 
 	repo := h.DBRepo.RepoFace
-	res, err := repo.DeleteId(id)
+	err := repo.DeleteId(id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	log.Println("delete count:", res.DeletedCount)
-	if res.DeletedCount > 0 {
-		return c.JSON(http.StatusOK, response.Response{Detail: "deleted"})
-	} else {
-		return echo.NewHTTPError(http.StatusInternalServerError)
-	}
+
+	log.Println("delete success")
+
+	return c.JSON(http.StatusOK, response.Response{Detail: "deleted"})
 }
 
 func (h Handler) FaceAll(c echo.Context) error {
 	repo := h.DBRepo.RepoFace
 	faces, err := repo.FindAll()
 	if err != nil {
-		log.Println("FindAll error:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -45,7 +42,6 @@ func (h Handler) FaceId(c echo.Context) error {
 	repo := h.DBRepo.RepoFace
 	faces, err := repo.FindById(id)
 	if err != nil {
-		log.Println("FindById error:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
