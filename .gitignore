@@ -1,8 +1,8 @@
 # My settings
-*.jpg
 *.db
 assets/
-
+.env
+.vscode/
 
 # Binaries for programs and plugins
 *.exe
@@ -21,7 +21,4 @@ assets/
 # vendor/
 
 
-.env
-.env
-.env
-.vscode/
+

@@ -1,17 +1,13 @@
 package handler
 
 import (
-	"bytes"
 	"errors"
 	"goface-api/database"
 	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/mymock"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -34,18 +30,8 @@ func TestHandler_Find_NoFile(t *testing.T) {
 }
 
 func TestHandler_Find_Happy(t *testing.T) {
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-
-	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
-
-	content, err := os.Open("../test/test_happy.jpg")
-	assert.NoError(t, err)
-
-	_, err = io.Copy(formFile, content) // copy content to formFile
-	assert.NoError(t, err)
-	assert.NoError(t, writer.Close())
 
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
@@ -70,19 +56,27 @@ func TestHandler_Find_Happy(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
+func TestHandler_Find_JpegError(t *testing.T) {
+	body, writer, err := helper.CreateFormData("file", "../test/test_noface.png")
+	assert.NoError(t, err)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	assert.NoError(t, err)
+
+	h := Handler{Rec: reco}
+
+	// Assertions
+	assert.Error(t, h.Find(c))
+}
 func TestHandler_Find_FindAllErr(t *testing.T) {
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-
-	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
-
-	content, err := os.Open("../test/test_happy.jpg")
-	assert.NoError(t, err)
-
-	_, err = io.Copy(formFile, content) // copy content to formFile
-	assert.NoError(t, err)
-	assert.NoError(t, writer.Close())
 
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)

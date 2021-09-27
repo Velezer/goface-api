@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"mime/multipart"
@@ -49,6 +50,28 @@ func SaveFile(dir string, filename string, content multipart.File) error {
 	}
 
 	return nil
+}
+
+// CreateFormData used for testing
+func CreateFormData(fieldname string, path string) (*bytes.Buffer, *multipart.Writer, error) {
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	formFile, err := writer.CreateFormFile(fieldname, "filename.jpg") // create empty formFile
+	if err != nil {
+		return body, nil, err
+	}
+
+	content, err := os.Open(path)
+	if err != nil {
+		return body, nil, err
+	}
+
+	_, err = io.Copy(formFile, content) // copy content to formFile
+	if err != nil {
+		return body, nil, err
+	}
+	return body, writer, writer.Close()
 }
 
 // not being used anymore

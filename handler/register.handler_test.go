@@ -1,17 +1,14 @@
 package handler
 
 import (
-	"bytes"
+	"errors"
 	"goface-api/database"
 	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/mymock"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -20,12 +17,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandler_Register_Happy(t *testing.T) {
-	faceData := models.Face{
-		Id:   "2131256312",
-		Name: "myname",
-	}
+var faceData models.Face = models.Face{
+	Id:   "2131256312",
+	Name: "myname",
+}
 
+func TestHandler_Register_Happy(t *testing.T) {
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
@@ -34,18 +31,8 @@ func TestHandler_Register_Happy(t *testing.T) {
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-
-	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
-
-	content, err := os.Open("../test/test_happy.jpg")
-	assert.NoError(t, err)
-
-	_, err = io.Copy(formFile, content) // copy content to formFile
-	assert.NoError(t, err)
-	assert.NoError(t, writer.Close())
 	// end formfile
 
 	e := echo.New()
@@ -74,13 +61,74 @@ func TestHandler_Register_Happy(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	}
 }
+func TestHandler_Register_JpegErr(t *testing.T) {
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	assert.NoError(t, err)
+
+	// formfile
+	body, writer, err := helper.CreateFormData("file", "../test/test_noface.png")
+	assert.NoError(t, err)
+	// end formfile
+
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
+	req.Form = url.Values{} // set field,value of form
+	req.Form.Set("id", faceData.Id)
+	req.Form.Set("name", faceData.Name)
+
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	h := Handler{Rec: reco}
+	// Assertions
+	assert.Error(t, h.Register(c))
+}
+func TestHandler_Register_NoFile(t *testing.T) {
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	assert.NoError(t, err)
+
+	// formfile
+	body, writer, err := helper.CreateFormData("error", "../test/test_noface.png")
+	assert.NoError(t, err)
+	// end formfile
+
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
+	req.Form = url.Values{} // set field,value of form
+	req.Form.Set("id", faceData.Id)
+	req.Form.Set("name", faceData.Name)
+
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	h := Handler{Rec: reco}
+	// Assertions
+	assert.Error(t, h.Register(c))
+}
+func TestHandler_Register_ValidationErr(t *testing.T) {
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPost, "/api/face/register", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	h := Handler{}
+	// Assertions
+	assert.Error(t, h.Register(c))
+}
 
 func TestHandler_RegisterPatch_Happy(t *testing.T) {
-	faceData := models.Face{
-		Id:   "2131256312",
-		Name: "myname",
-	}
-
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
@@ -89,18 +137,8 @@ func TestHandler_RegisterPatch_Happy(t *testing.T) {
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-
-	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
-
-	content, err := os.Open("../test/test_happy.jpg")
-	assert.NoError(t, err)
-
-	_, err = io.Copy(formFile, content) // copy content to formFile
-	assert.NoError(t, err)
-	assert.NoError(t, writer.Close())
 	// end formfile
 
 	e := echo.New()
@@ -130,13 +168,7 @@ func TestHandler_RegisterPatch_Happy(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
-
-func TestHandler_RegisterPatch_NotFound(t *testing.T) {
-	faceData := models.Face{
-		Id:   "2131256312",
-		Name: "myname",
-	}
-
+func TestHandler_RegisterPatch_PushErr(t *testing.T) {
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
@@ -145,18 +177,48 @@ func TestHandler_RegisterPatch_NotFound(t *testing.T) {
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
+	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	assert.NoError(t, err)
+	// end formfile
 
-	formFile, err := writer.CreateFormFile("file", "filename.jpg") // create empty formFile
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
+	req.Form = url.Values{} // set field,value of form
+	req.Form.Set("id", faceData.Id)
+	req.Form.Set("name", faceData.Name)
+
+	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	repo := new(mymock.MockRepoFace)
+	repo.On("FindById", faceData.Id).Return([]models.Face{faceData}, nil)
+	repo.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(errors.New("PushErr"))
+
+	dbRepo := database.DBRepo{
+		RepoFace: repo,
+	}
+
+	h := Handler{DBRepo: &dbRepo, Rec: reco}
+	// Assertions
+	assert.Error(t, h.RegisterPatch(c), "PushErr")
+
+}
+
+func TestHandler_RegisterPatch_NotFound(t *testing.T) {
+	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
-	content, err := os.Open("../test/test_happy.jpg")
+	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
 	assert.NoError(t, err)
+	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
-	_, err = io.Copy(formFile, content) // copy content to formFile
+	// formfile
+	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
-	assert.NoError(t, writer.Close())
 	// end formfile
 
 	e := echo.New()
@@ -181,6 +243,19 @@ func TestHandler_RegisterPatch_NotFound(t *testing.T) {
 	}
 
 	h := Handler{DBRepo: &dbRepo, Rec: reco}
+	// Assertions
+	assert.Error(t, h.RegisterPatch(c))
+}
+func TestHandler_RegisterPatch_ValidationErr(t *testing.T) {
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodPut, "/api/face/register", nil)
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	h := Handler{}
 	// Assertions
 	assert.Error(t, h.RegisterPatch(c))
 }
