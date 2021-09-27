@@ -17,7 +17,6 @@ import (
 )
 
 func TestHandler_Find_NoFile(t *testing.T) {
-	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
 	rec := httptest.NewRecorder()
@@ -26,14 +25,14 @@ func TestHandler_Find_NoFile(t *testing.T) {
 	h := Handler{}
 
 	// Assertions
-	assert.Error(t, h.Find(c))
+	errHandler := h.Find(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 }
 
 func TestHandler_Find_Happy(t *testing.T) {
 	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
 
-	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
 	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 	rec := httptest.NewRecorder()
@@ -42,11 +41,11 @@ func TestHandler_Find_Happy(t *testing.T) {
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
-	repo := new(mymock.MockRepoFace)
-	repo.On("FindAll").Return([]models.Face{}, nil)
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("FindAll").Return([]models.Face{}, nil)
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{Rec: reco, DBRepo: &dbRepo}
@@ -60,7 +59,6 @@ func TestHandler_Find_JpegError(t *testing.T) {
 	body, writer, err := helper.CreateFormData("file", "../test/test_noface.png")
 	assert.NoError(t, err)
 
-	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
 	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 	rec := httptest.NewRecorder()
@@ -71,14 +69,14 @@ func TestHandler_Find_JpegError(t *testing.T) {
 
 	h := Handler{Rec: reco}
 
-	// Assertions
-	assert.Error(t, h.Find(c))
+
+	errHandler := h.Find(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
 func TestHandler_Find_FindAllErr(t *testing.T) {
 	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
 	assert.NoError(t, err)
 
-	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
 	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 	rec := httptest.NewRecorder()
@@ -87,15 +85,16 @@ func TestHandler_Find_FindAllErr(t *testing.T) {
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
 	assert.NoError(t, err)
 
-	repo := new(mymock.MockRepoFace)
-	repo.On("FindAll").Return([]models.Face{}, errors.New("FindAllErr"))
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("FindAll").Return([]models.Face{}, errors.New("FindAllErr"))
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{Rec: reco, DBRepo: &dbRepo}
 
 	// Assertions
-	assert.Error(t, h.Find(c), "FindAllErr")
+	errHandler := h.Find(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }

@@ -15,7 +15,6 @@ import (
 )
 
 func TestHandler_Delete_Happy(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/face/:id", nil)
 
@@ -40,7 +39,6 @@ func TestHandler_Delete_Happy(t *testing.T) {
 	}
 }
 func TestHandler_Delete_DelError(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/face/:id", nil)
 
@@ -50,21 +48,21 @@ func TestHandler_Delete_DelError(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("23124112312")
 
-	repo := new(mymock.MockRepoFace)
-	repo.On("DeleteId", "23124112312").Return(errors.New("delete id error"))
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("DeleteId", "23124112312").Return(errors.New("delete id error"))
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{DBRepo: &dbRepo}
 
 	// Assertions
-	assert.Error(t, h.Delete(c), "delete id error")
+	errHandler := h.Delete(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
 
 func TestHandler_FaceAll_Happy(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/face/", nil)
 	rec := httptest.NewRecorder()
@@ -76,11 +74,12 @@ func TestHandler_FaceAll_Happy(t *testing.T) {
 		Name:        "myname",
 		Descriptors: []face.Descriptor{},
 	}
-	repo := new(mymock.MockRepoFace)
-	repo.On("FindAll").Return([]models.Face{faceData}, nil)
+
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("FindAll").Return([]models.Face{faceData}, nil)
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{DBRepo: &dbRepo}
@@ -91,7 +90,6 @@ func TestHandler_FaceAll_Happy(t *testing.T) {
 	}
 }
 func TestHandler_FaceAll_FindAllErr(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/face/", nil)
 	rec := httptest.NewRecorder()
@@ -103,21 +101,22 @@ func TestHandler_FaceAll_FindAllErr(t *testing.T) {
 		Name:        "myname",
 		Descriptors: []face.Descriptor{},
 	}
-	repo := new(mymock.MockRepoFace)
-	repo.On("FindAll").Return([]models.Face{faceData}, errors.New("FindAll err"))
+
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("FindAll").Return([]models.Face{faceData}, errors.New("FindAll err"))
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{DBRepo: &dbRepo}
 
 	// Assertions
-	assert.Error(t, h.FaceAll(c), "FindAll err")
+	errHandler := h.FaceAll(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
 
 func TestHandler_FaceId_Happy(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/face/:id", nil)
 	rec := httptest.NewRecorder()
@@ -131,11 +130,12 @@ func TestHandler_FaceId_Happy(t *testing.T) {
 		Name:        "myname",
 		Descriptors: []face.Descriptor{},
 	}
-	repo := new(mymock.MockRepoFace)
-	repo.On("FindById", "13213213").Return([]models.Face{faceData}, nil)
+
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("FindById", "13213213").Return([]models.Face{faceData}, nil)
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{DBRepo: &dbRepo}
@@ -146,7 +146,6 @@ func TestHandler_FaceId_Happy(t *testing.T) {
 	}
 }
 func TestHandler_FaceId_FindByIdErr(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/face/:id", nil)
 	rec := httptest.NewRecorder()
@@ -160,15 +159,17 @@ func TestHandler_FaceId_FindByIdErr(t *testing.T) {
 		Name:        "myname",
 		Descriptors: []face.Descriptor{},
 	}
-	repo := new(mymock.MockRepoFace)
-	repo.On("FindById", "13213213").Return([]models.Face{faceData}, errors.New("FindByIdErr"))
+
+	repoFace:=new(mymock.MockRepoFace)
+	repoFace.On("FindById", "13213213").Return([]models.Face{faceData}, errors.New("FindByIdErr"))
 
 	dbRepo := database.DBRepo{
-		RepoFace: repo,
+		RepoFace: repoFace,
 	}
 
 	h := Handler{DBRepo: &dbRepo}
 
 	// Assertions
-	assert.Error(t, h.FaceId(c), "FindByIdErr")
+	errHandler := h.FaceId(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }

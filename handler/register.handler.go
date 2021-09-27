@@ -34,14 +34,14 @@ func prepInputValidation(c echo.Context) (inputValidation, error) {
 func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face, int, error) {
 	content, err := getFileContent(c, "file")
 	if err != nil {
-		return models.Face{}, 500, err
+		return models.Face{}, http.StatusBadRequest, err
 	}
 
 	filename := time.Now().Local().String() + ".jpg"
 	filename = strings.Replace(filename, ":", "_", -1)
 	err = helper.SaveFile(helper.BaseDir, filename, content)
 	if err != nil {
-		return models.Face{}, 500, err
+		return models.Face{}, http.StatusInternalServerError, err
 	}
 	
 	knownFaces, code, err := helper.RecognizeFile(h.Rec, helper.BaseDir, filename)
@@ -55,7 +55,7 @@ func prepFaceData(c echo.Context, h Handler, input inputValidation) (models.Face
 		Descriptors: []face.Descriptor{knownFaces[0].Descriptor},
 	}
 
-	return faceData, 200, nil
+	return faceData, 1, nil
 }
 
 func (h Handler) Register(c echo.Context) error {

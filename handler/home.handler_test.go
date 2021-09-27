@@ -10,9 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var	e *echo.Echo= echo.New()
+
 func TestHandler_Home(t *testing.T) {
 	// Setup
-	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

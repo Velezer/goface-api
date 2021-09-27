@@ -35,7 +35,6 @@ func TestHandler_Register_Happy(t *testing.T) {
 	assert.NoError(t, err)
 	// end formfile
 
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
 	req.Form = url.Values{} // set field,value of form
@@ -70,7 +69,6 @@ func TestHandler_Register_JpegErr(t *testing.T) {
 	assert.NoError(t, err)
 	// end formfile
 
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
 	req.Form = url.Values{} // set field,value of form
@@ -85,7 +83,8 @@ func TestHandler_Register_JpegErr(t *testing.T) {
 
 	h := Handler{Rec: reco}
 	// Assertions
-	assert.Error(t, h.Register(c))
+	errHandler := h.Register(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
 func TestHandler_Register_NoFile(t *testing.T) {
 	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
@@ -96,7 +95,6 @@ func TestHandler_Register_NoFile(t *testing.T) {
 	assert.NoError(t, err)
 	// end formfile
 
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
 	req.Form = url.Values{} // set field,value of form
@@ -111,10 +109,10 @@ func TestHandler_Register_NoFile(t *testing.T) {
 
 	h := Handler{Rec: reco}
 	// Assertions
-	assert.Error(t, h.Register(c))
+	errHandler := h.Register(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 }
 func TestHandler_Register_ValidationErr(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/register", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
@@ -125,7 +123,8 @@ func TestHandler_Register_ValidationErr(t *testing.T) {
 
 	h := Handler{}
 	// Assertions
-	assert.Error(t, h.Register(c))
+	errHandler := h.Register(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 }
 
 func TestHandler_RegisterPatch_Happy(t *testing.T) {
@@ -141,7 +140,6 @@ func TestHandler_RegisterPatch_Happy(t *testing.T) {
 	assert.NoError(t, err)
 	// end formfile
 
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
 	req.Form = url.Values{} // set field,value of form
@@ -181,7 +179,6 @@ func TestHandler_RegisterPatch_PushErr(t *testing.T) {
 	assert.NoError(t, err)
 	// end formfile
 
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
 	req.Form = url.Values{} // set field,value of form
@@ -204,7 +201,8 @@ func TestHandler_RegisterPatch_PushErr(t *testing.T) {
 
 	h := Handler{DBRepo: &dbRepo, Rec: reco}
 	// Assertions
-	assert.Error(t, h.RegisterPatch(c), "PushErr")
+	errHandler := h.RegisterPatch(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 
 }
 
@@ -221,7 +219,6 @@ func TestHandler_RegisterPatch_NotFound(t *testing.T) {
 	assert.NoError(t, err)
 	// end formfile
 
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
 	req.Form = url.Values{} // set field,value of form
@@ -244,10 +241,10 @@ func TestHandler_RegisterPatch_NotFound(t *testing.T) {
 
 	h := Handler{DBRepo: &dbRepo, Rec: reco}
 	// Assertions
-	assert.Error(t, h.RegisterPatch(c))
+	errHandler := h.RegisterPatch(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusNotFound, errHandler.Code)
 }
 func TestHandler_RegisterPatch_ValidationErr(t *testing.T) {
-	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPut, "/api/face/register", nil)
 
@@ -257,5 +254,6 @@ func TestHandler_RegisterPatch_ValidationErr(t *testing.T) {
 
 	h := Handler{}
 	// Assertions
-	assert.Error(t, h.RegisterPatch(c))
+	errHandler := h.RegisterPatch(c).(*echo.HTTPError)
+	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 }

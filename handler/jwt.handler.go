@@ -61,7 +61,7 @@ func (h Handler) JWTRegister(c echo.Context) error {
 	v := validator.New()
 	err = v.Struct(adminData)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	hashed, err := h.Bcrypt.GenerateFromPassword([]byte(adminData.Password), bcrypt.DefaultCost)

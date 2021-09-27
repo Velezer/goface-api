@@ -31,7 +31,7 @@ func (h Handler) Find(c echo.Context) error {
 	repo := h.DBRepo.RepoFace
 	samples, err := repo.FindAll()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	dSlice := response.DetectedSlice{}
 	dSlice.FillSortDetectedFromDB(unknownFaces[0].Descriptor, samples, 0.25)
