@@ -16,12 +16,19 @@ import (
 )
 
 func main() {
-	dbrepo := database.InitDB()
+	// setup
+	dbrepo, err := database.InitDB()
+	if err != nil {
+		log.Fatalf("Can't init face recognizer: %v", err)
+	}
+
 	rec, err := face.NewRecognizer(helper.ModelDir)
 	rec.Close()
 	if err != nil {
 		log.Fatalf("Can't init face recognizer: %v", err)
 	}
+
+	// end setup
 
 	h := handler.Handler{Rec: rec, DBRepo: dbrepo, Bcrypt: mymock.RealBcrypt{}}
 	e := echo.New()

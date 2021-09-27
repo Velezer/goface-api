@@ -9,6 +9,8 @@ type BcryptIface interface {
 	GenerateFromPassword(password []byte, cost int) ([]byte, error)
 }
 
+// ------mock bcrypt----------
+
 type MockBcrypt struct {
 	mock.Mock
 }
@@ -19,10 +21,15 @@ func (b MockBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, err
 	return args.Get(0).([]byte), args.Error(1) // type cast
 }
 
-type RealBcrypt struct{
+// ------end mock bcrypt----------
 
+// ------real bcrypt----------
+
+type RealBcrypt struct {
 }
 
 func (b RealBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 	return bcrypt.GenerateFromPassword(password, cost)
 }
+
+// ------end real bcrypt----------
