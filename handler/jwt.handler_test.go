@@ -82,13 +82,12 @@ func TestHandler_JWTLogin_BindErr_NoContentType(t *testing.T) {
 }
 
 func TestHandler_JWTRegister_Happy(t *testing.T) {
-	reqJSON := `{"username":"krefa","password":"krefa"}`
+	reqJSON := `{"username":"krefa","password":"` + adminData.Password + `"}`
 
 	req := httptest.NewRequest(http.MethodPost, "/jwt/register", strings.NewReader(reqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
 
 	mockBcrypt := new(mymock.MockBcrypt)
 	mockBcrypt.On("GenerateFromPassword", []byte(adminData.Password), bcrypt.DefaultCost).Return([]byte(adminData.Password), nil)
@@ -99,7 +98,7 @@ func TestHandler_JWTRegister_Happy(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoAdmin: repo,
 	}
-	h.Bcrypt=mockBcrypt
+	h.Bcrypt = mockBcrypt
 
 	// Assertions
 	if assert.NoError(t, h.JWTRegister(c)) {
@@ -107,7 +106,7 @@ func TestHandler_JWTRegister_Happy(t *testing.T) {
 	}
 }
 func TestHandler_JWTRegister_HashErr(t *testing.T) {
-	reqJSON := `{"username":"krefa","password":"krefa"}`
+	reqJSON := `{"username":"krefa","password":"` + adminData.Password + `"}`
 
 	req := httptest.NewRequest(http.MethodPost, "/jwt/register", strings.NewReader(reqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -117,15 +116,14 @@ func TestHandler_JWTRegister_HashErr(t *testing.T) {
 	mockBcrypt := new(mymock.MockBcrypt)
 	mockBcrypt.On("GenerateFromPassword", []byte(adminData.Password), bcrypt.DefaultCost).Return([]byte(adminData.Password), errors.New("HashErr"))
 
-
-	h.Bcrypt=mockBcrypt
+	h.Bcrypt = mockBcrypt
 
 	errHandler := h.JWTRegister(c).(*echo.HTTPError)
 	// Assertions
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
 func TestHandler_JWTRegister_InsertOneErr(t *testing.T) {
-	reqJSON := `{"username":"krefa","password":"krefa"}`
+	reqJSON := `{"username":"krefa","password":"` + adminData.Password + `"}`
 
 	req := httptest.NewRequest(http.MethodPost, "/jwt/register", strings.NewReader(reqJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -141,7 +139,7 @@ func TestHandler_JWTRegister_InsertOneErr(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoAdmin: repo,
 	}
-	h.Bcrypt=mockBcrypt
+	h.Bcrypt = mockBcrypt
 
 	errHandler := h.JWTRegister(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
