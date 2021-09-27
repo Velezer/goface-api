@@ -8,10 +8,8 @@ import (
 	"goface-api/mymock"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
-	"github.com/Kagami/go-face"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,8 +19,6 @@ func TestHandler_Find_NoFile(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
-	h := Handler{}
 
 	// Assertions
 	errHandler := h.Find(c).(*echo.HTTPError)
@@ -38,17 +34,13 @@ func TestHandler_Find_Happy(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
-	assert.NoError(t, err)
-
-	repoFace:=new(mymock.MockRepoFace)
+	repoFace := new(mymock.MockRepoFace)
 	repoFace.On("FindAll").Return([]models.Face{}, nil)
 
-	dbRepo := database.DBRepo{
+	h.DBRepo = &database.DBRepo{
 		RepoFace: repoFace,
 	}
-
-	h := Handler{Rec: reco, DBRepo: &dbRepo}
+	h.Rec = reco
 
 	// Assertions
 	if assert.NoError(t, h.Find(c)) {
@@ -64,11 +56,7 @@ func TestHandler_Find_JpegError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
-	assert.NoError(t, err)
-
-	h := Handler{Rec: reco}
-
+	h.Rec = reco
 
 	errHandler := h.Find(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
@@ -82,17 +70,12 @@ func TestHandler_Find_FindAllErr(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	reco, err := face.NewRecognizer(filepath.Join("../", helper.ModelDir))
-	assert.NoError(t, err)
-
-	repoFace:=new(mymock.MockRepoFace)
+	repoFace := new(mymock.MockRepoFace)
 	repoFace.On("FindAll").Return([]models.Face{}, errors.New("FindAllErr"))
 
-	dbRepo := database.DBRepo{
+	h.DBRepo = &database.DBRepo{
 		RepoFace: repoFace,
 	}
-
-	h := Handler{Rec: reco, DBRepo: &dbRepo}
 
 	// Assertions
 	errHandler := h.Find(c).(*echo.HTTPError)

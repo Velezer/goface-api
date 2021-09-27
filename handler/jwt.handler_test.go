@@ -23,20 +23,15 @@ func TestHandler_JWTLogin_Happy(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	adminData := models.Admin{
-		Username: "krefa",
-		Password: "krefa",
-	}
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(adminData.Password), bcrypt.DefaultCost)
 	adminData.Password = string(hashed)
 
 	repo := new(mymock.MockRepoAdmin)
 	repo.On("FindOneByID", "krefa").Return(adminData, nil)
 
-	dbRepo := database.DBRepo{
+	h.DBRepo = &database.DBRepo{
 		RepoAdmin: repo,
 	}
-	h := Handler{DBRepo: &dbRepo}
 
 	// Assertions
 	if assert.NoError(t, h.JWTLogin(c)) {
@@ -55,10 +50,9 @@ func TestHandler_JWTLogin_InsertOneErr(t *testing.T) {
 	repo := new(mymock.MockRepoAdmin)
 	repo.On("FindOneByID", "krefa").Return(models.Admin{}, errors.New("InsertOneErr"))
 
-	dbRepo := database.DBRepo{
+	h.DBRepo = &database.DBRepo{
 		RepoAdmin: repo,
 	}
-	h := Handler{DBRepo: &dbRepo}
 
 	errHandler := h.JWTLogin(c).(*echo.HTTPError)
 	// Assertions
@@ -82,8 +76,6 @@ func TestHandler_JWTLogin_BindErr_NoContentType(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := Handler{}
-
 	errHandler := h.JWTLogin(c).(*echo.HTTPError)
 	// Assertions
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
@@ -97,10 +89,6 @@ func TestHandler_JWTRegister_Happy(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	adminData := models.Admin{
-		Username: "krefa",
-		Password: "krefa",
-	}
 
 	mockBcrypt := new(mymock.MockBcrypt)
 	mockBcrypt.On("GenerateFromPassword", []byte(adminData.Password), bcrypt.DefaultCost).Return([]byte(adminData.Password), nil)
@@ -108,10 +96,10 @@ func TestHandler_JWTRegister_Happy(t *testing.T) {
 	repo := new(mymock.MockRepoAdmin)
 	repo.On("InsertOne", adminData).Return(nil)
 
-	dbRepo := database.DBRepo{
+	h.DBRepo = &database.DBRepo{
 		RepoAdmin: repo,
 	}
-	h := Handler{DBRepo: &dbRepo, Bcrypt: mockBcrypt}
+	h.Bcrypt=mockBcrypt
 
 	// Assertions
 	if assert.NoError(t, h.JWTRegister(c)) {
@@ -126,15 +114,11 @@ func TestHandler_JWTRegister_HashErr(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	adminData := models.Admin{
-		Username: "krefa",
-		Password: "krefa",
-	}
-
 	mockBcrypt := new(mymock.MockBcrypt)
 	mockBcrypt.On("GenerateFromPassword", []byte(adminData.Password), bcrypt.DefaultCost).Return([]byte(adminData.Password), errors.New("HashErr"))
 
-	h := Handler{Bcrypt: mockBcrypt}
+
+	h.Bcrypt=mockBcrypt
 
 	errHandler := h.JWTRegister(c).(*echo.HTTPError)
 	// Assertions
@@ -148,21 +132,16 @@ func TestHandler_JWTRegister_InsertOneErr(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	adminData := models.Admin{
-		Username: "krefa",
-		Password: "krefa",
-	}
-
 	mockBcrypt := new(mymock.MockBcrypt)
 	mockBcrypt.On("GenerateFromPassword", []byte(adminData.Password), bcrypt.DefaultCost).Return([]byte(adminData.Password), nil)
 
 	repo := new(mymock.MockRepoAdmin)
 	repo.On("InsertOne", adminData).Return(errors.New("InsertOneErr"))
 
-	dbRepo := database.DBRepo{
+	h.DBRepo = &database.DBRepo{
 		RepoAdmin: repo,
 	}
-	h := Handler{DBRepo: &dbRepo, Bcrypt: mockBcrypt}
+	h.Bcrypt=mockBcrypt
 
 	errHandler := h.JWTRegister(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
@@ -186,8 +165,6 @@ func TestHandler_JWTRegister_BindErr_NoContentType(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/jwt/register", strings.NewReader(reqJSON))
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
-	h := Handler{}
 
 	// Assertions
 	errHandler := h.JWTRegister(c).(*echo.HTTPError)
