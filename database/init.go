@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"goface-api/config"
+	"goface-api/iface"
 	"goface-api/models"
 	"time"
 
@@ -12,8 +13,8 @@ import (
 )
 
 type DBRepo struct {
-	RepoAdmin models.RepositoryAdminIface
-	RepoFace  models.RepositoryFaceIface
+	RepoAdmin iface.RepositoryAdminIface
+	RepoFace  iface.RepositoryFaceIface
 }
 
 func InitDB() (*DBRepo, error) {

@@ -2,12 +2,7 @@ package mymock
 
 import (
 	"github.com/stretchr/testify/mock"
-	"golang.org/x/crypto/bcrypt"
 )
-
-type BcryptIface interface {
-	GenerateFromPassword(password []byte, cost int) ([]byte, error)
-}
 
 // ------mock bcrypt----------
 
@@ -22,14 +17,3 @@ func (b MockBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, err
 }
 
 // ------end mock bcrypt----------
-
-// ------real bcrypt----------
-
-type RealBcrypt struct {
-}
-
-func (b RealBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, error) {
-	return bcrypt.GenerateFromPassword(password, cost)
-}
-
-// ------end real bcrypt----------

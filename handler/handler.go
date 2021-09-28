@@ -2,18 +2,21 @@ package handler
 
 import (
 	"goface-api/database"
-	"goface-api/mymock"
+	"goface-api/iface"
 	"mime/multipart"
 
 	"github.com/Kagami/go-face"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
 	Rec    *face.Recognizer
 	DBRepo *database.DBRepo
-	Bcrypt mymock.BcryptIface
+	Bcrypt iface.BcryptIface
 }
+
+
 
 type inputValidation struct {
 	Id   string `form:"id" json:"id" validate:"required,gte=9,lte=16"`
@@ -33,3 +36,15 @@ func getFileContent(c echo.Context, fieldName string) (multipart.File, error) {
 
 	return content, nil
 }
+
+
+// ------real bcrypt----------
+
+type RealBcrypt struct {
+}
+
+func (b RealBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, error) {
+	return bcrypt.GenerateFromPassword(password, cost)
+}
+
+// ------end real bcrypt----------

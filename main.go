@@ -4,7 +4,6 @@ import (
 	"goface-api/database"
 	"goface-api/handler"
 	"goface-api/helper"
-	"goface-api/mymock"
 	"goface-api/routes"
 	"log"
 	"net/http"
@@ -30,7 +29,7 @@ func main() {
 
 	// end setup
 
-	h := handler.Handler{Rec: rec, DBRepo: dbrepo, Bcrypt: mymock.RealBcrypt{}}
+	h := handler.Handler{Rec: rec, DBRepo: dbrepo, Bcrypt: handler.RealBcrypt{}}
 	e := echo.New()
 
 	// e.Debug = true
