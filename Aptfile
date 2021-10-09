@@ -1,4 +1,4 @@
-# use this file by using apt buildpack
+# use this file by using apt buildpack to deploy on heroku
 # https://buildpack-registry.s3.amazonaws.com/buildpacks/heroku-community/apt.tgz
 build-essential
 

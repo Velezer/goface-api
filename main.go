@@ -18,20 +18,21 @@ func main() {
 	// setup
 	dbrepo, err := database.InitDB()
 	if err != nil {
-		log.Fatalf("Can't init face recognizer: %v", err)
+		log.Fatalf("Can't init databse: %v", err)
 	}
 	if dbrepo == nil {
 		log.Fatalln("dbrepo is nil")
 	}
-	
+
 	rec, err := face.NewRecognizer(helper.ModelDir)
-	rec.Close()
 	if err != nil {
 		log.Fatalf("Can't init face recognizer: %v", err)
 	}
+	defer rec.Close()
 	if rec == nil {
 		log.Fatalln("rec is nil")
 	}
+	log.Println("rec: ", rec)
 
 	// end setup
 
