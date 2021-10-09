@@ -27,8 +27,10 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+	defer reco.Close()
+
 	e = echo.New()
-	h = Handler{}
+	h = Handler{Rec: reco}
 	faceData = models.Face{
 		Id:          "4871847291721",
 		Name:        "myname",

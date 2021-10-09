@@ -46,7 +46,6 @@ func TestHandler_Register_Happy(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoFace: repo,
 	}
-	h.Rec = reco
 
 	// Assertions
 	if assert.NoError(t, h.Register(c)) {
@@ -71,7 +70,6 @@ func TestHandler_Register_JpegErr(t *testing.T) {
 
 	c := e.NewContext(req, rec)
 
-	h.Rec = reco
 	// Assertions
 	errHandler := h.Register(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
@@ -94,7 +92,6 @@ func TestHandler_Register_NoFile(t *testing.T) {
 
 	c := e.NewContext(req, rec)
 
-	h.Rec = reco
 	// Assertions
 	errHandler := h.Register(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
@@ -142,7 +139,6 @@ func TestHandler_RegisterPatch_Happy(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoFace: repo,
 	}
-	h.Rec = reco
 
 	// Assertions
 	if assert.NoError(t, h.RegisterPatch(c)) {
@@ -177,7 +173,6 @@ func TestHandler_RegisterPatch_PushErr(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoFace: repo,
 	}
-	h.Rec = reco
 	// Assertions
 	errHandler := h.RegisterPatch(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
@@ -213,7 +208,6 @@ func TestHandler_RegisterPatch_NotFound(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoFace: repo,
 	}
-	h.Rec = reco
 	// Assertions
 	errHandler := h.RegisterPatch(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusNotFound, errHandler.Code)

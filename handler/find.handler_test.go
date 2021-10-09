@@ -40,7 +40,6 @@ func TestHandler_Find_Happy(t *testing.T) {
 	h.DBRepo = &database.DBRepo{
 		RepoFace: repoFace,
 	}
-	h.Rec = reco
 
 	// Assertions
 	if assert.NoError(t, h.Find(c)) {
@@ -55,8 +54,6 @@ func TestHandler_Find_JpegError(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
-	h.Rec = reco
 
 	errHandler := h.Find(c).(*echo.HTTPError)
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
