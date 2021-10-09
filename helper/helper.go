@@ -74,39 +74,3 @@ func CreateFormData(fieldname string, path string) (*bytes.Buffer, *multipart.Wr
 	return body, writer, writer.Close()
 }
 
-// not being used anymore
-// func OSReadDir(root string, extension string) (dirs []string, files []string) {
-// 	f, _ := os.Open(root)
-// 	defer f.Close()
-
-// 	fileInfo, _ := f.Readdir(-1)
-// 	for _, file := range fileInfo {
-// 		if strings.Contains(file.Name(), extension) {
-// 			files = append(files, file.Name())
-// 		}
-// 		if file.IsDir() {
-// 			dirs = append(dirs, file.Name())
-// 		}
-// 	}
-// 	return
-// }
-
-// func DumpToJson(dir string, filename string, content face.Descriptor) {
-// 	os.Mkdir(dir, os.ModeDir)
-// 	file, _ := os.Create(filepath.Join(dir, filename))
-// 	defer file.Close()
-
-// 	encoder := json.NewEncoder(file)
-// 	encoder.Encode(content)
-
-// }
-
-// func DecodeFromJson(dir string, filename string) (content face.Descriptor) {
-// 	file, _ := os.Open(filepath.Join(dir, filename))
-// 	defer file.Close()
-
-// 	decoder := json.NewDecoder(file)
-// 	decoder.Decode(&content)
-
-// 	return content
-// }
