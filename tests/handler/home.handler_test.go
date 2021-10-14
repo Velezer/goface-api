@@ -1,6 +1,10 @@
-package handler
+package handler_test
 
 import (
+	"github.com/Kagami/go-face"
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+	. "goface-api/handler"
 	"goface-api/helper"
 	"goface-api/models"
 	"net/http"
@@ -9,10 +13,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/Kagami/go-face"
-	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
 var e *echo.Echo
@@ -23,7 +23,7 @@ var faceData models.Face
 var adminData models.Admin
 
 func TestMain(m *testing.M) {
-	reco, err = face.NewRecognizer(filepath.Join("../", helper.ModelDir))
+	reco, err = face.NewRecognizer(filepath.Join("../../", helper.ModelDir))
 	if err != nil {
 		panic(err)
 	}
@@ -49,8 +49,6 @@ func TestHandler_Home(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
-	h := &Handler{}
 
 	// Assertions
 	if assert.NoError(t, h.Home(c)) {

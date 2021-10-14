@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"errors"
@@ -20,12 +20,12 @@ import (
 
 func TestHandler_Register_Happy(t *testing.T) {
 
-	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
+	facerec, err := reco.RecognizeFile("../test_happy.jpg")
 	assert.NoError(t, err)
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 	// end formfile
 
@@ -55,7 +55,7 @@ func TestHandler_Register_Happy(t *testing.T) {
 func TestHandler_Register_JpegErr(t *testing.T) {
 
 	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test/test_noface.png")
+	body, writer, err := helper.CreateFormData("file", "../test_noface.png")
 	assert.NoError(t, err)
 	// end formfile
 
@@ -77,7 +77,7 @@ func TestHandler_Register_JpegErr(t *testing.T) {
 func TestHandler_Register_NoFile(t *testing.T) {
 
 	// formfile
-	body, writer, err := helper.CreateFormData("error", "../test/test_noface.png")
+	body, writer, err := helper.CreateFormData("error", "../test_noface.png")
 	assert.NoError(t, err)
 	// end formfile
 
@@ -112,12 +112,12 @@ func TestHandler_Register_ValidationErr(t *testing.T) {
 
 func TestHandler_RegisterPatch_Happy(t *testing.T) {
 
-	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
+	facerec, err := reco.RecognizeFile("../test_happy.jpg")
 	assert.NoError(t, err)
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 	// end formfile
 
@@ -146,12 +146,12 @@ func TestHandler_RegisterPatch_Happy(t *testing.T) {
 	}
 }
 func TestHandler_RegisterPatch_PushErr(t *testing.T) {
-	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
+	facerec, err := reco.RecognizeFile("../test_happy.jpg")
 	assert.NoError(t, err)
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 	// end formfile
 
@@ -181,12 +181,12 @@ func TestHandler_RegisterPatch_PushErr(t *testing.T) {
 
 func TestHandler_RegisterPatch_NotFound(t *testing.T) {
 
-	facerec, err := reco.RecognizeFile("../test/test_happy.jpg")
+	facerec, err := reco.RecognizeFile("../test_happy.jpg")
 	assert.NoError(t, err)
 	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
 	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 	// end formfile
 

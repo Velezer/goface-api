@@ -4,7 +4,6 @@ import (
 	"goface-api/helper"
 	"goface-api/models"
 	"goface-api/response"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -63,7 +62,6 @@ func (h Handler) Register(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	log.Println("register input ", input)
 	faceData, code, err := prepFaceData(c, h, input)
 	if err != nil {
 		return echo.NewHTTPError(code, err.Error())
@@ -76,8 +74,6 @@ func (h Handler) Register(c echo.Context) error {
 	} else if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-
-	log.Println("Insert data success ")
 
 	return c.JSON(http.StatusCreated, response.Response{
 		Detail: "Sukses menambahkan wajah",
@@ -108,8 +104,6 @@ func (h Handler) RegisterPatch(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-
-	log.Println("Sukses menambahkan descriptor wajah ", faceData.Name, faceData.Id)
 
 	return c.JSON(http.StatusOK, response.Response{
 		Detail: "Sukses menambahkan descriptor wajah " + faceData.Name,

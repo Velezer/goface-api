@@ -1,16 +1,15 @@
-package handler
+package handler_test
 
 import (
 	"errors"
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
 	"goface-api/database"
 	"goface-api/models"
 	"goface-api/mymock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_Delete_Happy(t *testing.T) {
@@ -80,7 +79,6 @@ func TestHandler_FaceAll_FindAllErr(t *testing.T) {
 
 	c := e.NewContext(req, rec)
 
-
 	repoFace := new(mymock.MockRepoFace)
 	repoFace.On("FindAll").Return([]models.Face{faceData}, errors.New("FindAll err"))
 
@@ -101,7 +99,6 @@ func TestHandler_FaceId_Happy(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")
 	c.SetParamValues("13213213")
-
 
 	repoFace := new(mymock.MockRepoFace)
 	repoFace.On("FindById", "13213213").Return([]models.Face{faceData}, nil)

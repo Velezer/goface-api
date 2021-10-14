@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"errors"
@@ -26,7 +26,7 @@ func TestHandler_Find_NoFile(t *testing.T) {
 }
 
 func TestHandler_Find_Happy(t *testing.T) {
-	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
@@ -47,7 +47,7 @@ func TestHandler_Find_Happy(t *testing.T) {
 	}
 }
 func TestHandler_Find_JpegError(t *testing.T) {
-	body, writer, err := helper.CreateFormData("file", "../test/test_noface.png")
+	body, writer, err := helper.CreateFormData("file", "../test_noface.png")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
@@ -59,7 +59,7 @@ func TestHandler_Find_JpegError(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
 func TestHandler_Find_FindAllErr(t *testing.T) {
-	body, writer, err := helper.CreateFormData("file", "../test/test_happy.jpg")
+	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)

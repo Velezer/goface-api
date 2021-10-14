@@ -3,7 +3,6 @@ package handler
 import (
 	"goface-api/helper"
 	"goface-api/response"
-	"log"
 	"net/http"
 	"time"
 
@@ -37,7 +36,6 @@ func (h Handler) Find(c echo.Context) error {
 	dSlice.FillSortDetectedFromDB(unknownFaces[0].Descriptor, samples, 0.25)
 
 	elapsed := time.Since(start)
-	log.Println("Detected:", dSlice, "in", elapsed.String())
 	return c.JSON(http.StatusOK, response.Response{
 		Detail:       "Sukses mendeteksi wajah",
 		Data:         dSlice,

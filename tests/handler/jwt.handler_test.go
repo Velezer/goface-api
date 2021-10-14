@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"errors"
@@ -63,7 +63,6 @@ func TestHandler_JWTLogin_ValidationError(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	h := Handler{}
 
 	// Assertions
 	errHandler := h.JWTLogin(c).(*echo.HTTPError)
@@ -150,8 +149,6 @@ func TestHandler_JWTRegister_ValidationError(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
-	h := Handler{}
 
 	// Assertions
 	errHandler := h.JWTRegister(c).(*echo.HTTPError)
