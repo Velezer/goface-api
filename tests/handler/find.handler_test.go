@@ -25,7 +25,7 @@ func TestHandler_Find_NoFile(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 }
 
-func TestHandler_Find_Happy(t *testing.T) {
+func TestHandler_Find_HappyFile(t *testing.T) {
 	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
 	assert.NoError(t, err)
 
@@ -35,18 +35,26 @@ func TestHandler_Find_Happy(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	repoFace := new(mymock.MockRepoFace)
-	repoFace.On("FindAll").Return([]models.Face{}, nil)
 
 	h.DBRepo = &database.DBRepo{
 		RepoFace: repoFace,
 	}
 
-	// Assertions
-	if assert.NoError(t, h.Find(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-	}
+	t.Run("Find Happy", func(t *testing.T) {
+		repoFace.On("FindAll").Return([]models.Face{}, nil).Once()
+		if assert.NoError(t, h.Find(c)) {
+			assert.Equal(t, http.StatusOK, rec.Code)
+		}
+	})
+	t.Run("Find FindAllErr", func(t *testing.T) {
+		repoFace.On("FindAll").Return([]models.Face{}, errors.New("FindAllErr"))
+
+		errHandler := h.Find(c).(*echo.HTTPError)
+		assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
+	})
+
 }
-func TestHandler_Find_JpegError(t *testing.T) {
+func TestHandler_Find_NoFaceFile(t *testing.T) {
 	body, writer, err := helper.CreateFormData("file", "../test_noface.png")
 	assert.NoError(t, err)
 
@@ -55,26 +63,9 @@ func TestHandler_Find_JpegError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	errHandler := h.Find(c).(*echo.HTTPError)
-	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
-}
-func TestHandler_Find_FindAllErr(t *testing.T) {
-	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
-	assert.NoError(t, err)
+	t.Run("Find FindAllErr", func(t *testing.T) {
+		errHandler := h.Find(c).(*echo.HTTPError)
+		assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
+	})
 
-	req := httptest.NewRequest(http.MethodPost, "/api/face/find", body)
-	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
-	repoFace := new(mymock.MockRepoFace)
-	repoFace.On("FindAll").Return([]models.Face{}, errors.New("FindAllErr"))
-
-	h.DBRepo = &database.DBRepo{
-		RepoFace: repoFace,
-	}
-
-	// Assertions
-	errHandler := h.Find(c).(*echo.HTTPError)
-	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 }
