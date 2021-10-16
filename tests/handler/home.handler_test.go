@@ -1,18 +1,21 @@
 package handler_test
 
 import (
-	"github.com/Kagami/go-face"
-	"github.com/labstack/echo/v4"
-	"github.com/stretchr/testify/assert"
+	"goface-api/database"
 	. "goface-api/handler"
 	"goface-api/helper"
 	"goface-api/models"
+	"goface-api/mymock"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/Kagami/go-face"
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
 )
 
 var e *echo.Echo
@@ -21,6 +24,9 @@ var err error
 var h Handler
 var faceData models.Face
 var adminData models.Admin
+var mockRepoFace = new(mymock.MockRepoFace)
+var mockBcrypt = new(mymock.MockBcrypt)
+var mockRepoAdmin = new(mymock.MockRepoAdmin)
 
 func TestMain(m *testing.M) {
 	reco, err = face.NewRecognizer(filepath.Join("../../", helper.ModelDir))
@@ -31,6 +37,14 @@ func TestMain(m *testing.M) {
 
 	e = echo.New()
 	h = Handler{Rec: reco}
+
+	h.Bcrypt = mockBcrypt
+
+	h.DBRepo = &database.DBRepo{
+		RepoFace: mockRepoFace,
+		RepoAdmin: mockRepoAdmin,
+	}
+
 	faceData = models.Face{
 		Id:          "4871847291721",
 		Name:        "myname",

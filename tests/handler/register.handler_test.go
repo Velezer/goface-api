@@ -2,10 +2,8 @@ package handler_test
 
 import (
 	"errors"
-	"goface-api/database"
 	"goface-api/helper"
 	"goface-api/models"
-	"goface-api/mymock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -16,152 +14,153 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandler_Register_Happy(t *testing.T) {
+func TestHandler_Register(t *testing.T) {
+	t.Run("Validation Error",func(t *testing.T) {
 
-	facerec, err := reco.RecognizeFile("../test_happy.jpg")
-	assert.NoError(t, err)
-	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
+		req := httptest.NewRequest(http.MethodPost, "/api/face/register", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
+	
+		rec := httptest.NewRecorder()
+	
+		c := e.NewContext(req, rec)
+	
+		// Assertions
+		errHandler := h.Register(c).(*echo.HTTPError)
+		assert.Equal(t, http.StatusBadRequest, errHandler.Code)
+	})
 
-	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
-	assert.NoError(t, err)
-	// end formfile
+	t.Run("No File", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
-	req.Form = url.Values{} // set field,value of form
-	req.Form.Set("id", faceData.Id)
-	req.Form.Set("name", faceData.Name)
+		req := httptest.NewRequest(http.MethodPost, "/api/face/register", nil)
+		req.Form = url.Values{} // set field,value of form
+		req.Form.Set("id", faceData.Id)
+		req.Form.Set("name", faceData.Name)
 
-	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+		req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
 
-	rec := httptest.NewRecorder()
+		rec := httptest.NewRecorder()
 
-	c := e.NewContext(req, rec)
+		c := e.NewContext(req, rec)
 
-	repo := new(mymock.MockRepoFace)
-	repo.On("InsertOne", faceData).Return(nil)
+		// Assertions
+		errHandler := h.Register(c).(*echo.HTTPError)
+		assert.Equal(t, http.StatusBadRequest, errHandler.Code)
+	})
 
-	h.DBRepo = &database.DBRepo{
-		RepoFace: repo,
-	}
+	t.Run("No Face", func(t *testing.T) {
 
-	// Assertions
-	if assert.NoError(t, h.Register(c)) {
-		assert.Equal(t, http.StatusCreated, rec.Code)
-	}
-}
-func TestHandler_Register_JpegErr(t *testing.T) {
-	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test_noface.png")
-	assert.NoError(t, err)
-	// end formfile
+		// formfile
+		body, writer, err := helper.CreateFormData("file", "../test_noface.png")
+		assert.NoError(t, err)
+		// end formfile
 
-	req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
-	req.Form = url.Values{} // set field,value of form
-	req.Form.Set("id", faceData.Id)
-	req.Form.Set("name", faceData.Name)
+		req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
+		req.Form = url.Values{} // set field,value of form
+		req.Form.Set("id", faceData.Id)
+		req.Form.Set("name", faceData.Name)
 
-	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+		req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 
-	rec := httptest.NewRecorder()
+		rec := httptest.NewRecorder()
 
-	c := e.NewContext(req, rec)
+		c := e.NewContext(req, rec)
 
-	// Assertions
-	errHandler := h.Register(c).(*echo.HTTPError)
-	assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
-}
-func TestHandler_Register_NoFile(t *testing.T) {
+		// Assertions
+		errHandler := h.Register(c).(*echo.HTTPError)
+		assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
+	})
 
-	req := httptest.NewRequest(http.MethodPost, "/api/face/register", nil)
-	req.Form = url.Values{} // set field,value of form
-	req.Form.Set("id", faceData.Id)
-	req.Form.Set("name", faceData.Name)
+	t.Run("Happy File", func(t *testing.T) {
 
-	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
+		facerec, err := reco.RecognizeFile("../test_happy.jpg")
+		assert.NoError(t, err)
+		faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
 
-	rec := httptest.NewRecorder()
+		// formfile
+		body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
+		assert.NoError(t, err)
+		// end formfile
 
-	c := e.NewContext(req, rec)
+		req := httptest.NewRequest(http.MethodPost, "/api/face/register", body)
+		req.Form = url.Values{} // set field,value of form
+		req.Form.Set("id", faceData.Id)
+		req.Form.Set("name", faceData.Name)
 
-	// Assertions
-	errHandler := h.Register(c).(*echo.HTTPError)
-	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
-}
-func TestHandler_Register_ValidationErr(t *testing.T) {
+		req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 
-	req := httptest.NewRequest(http.MethodPost, "/api/face/register", nil)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEMultipartForm)
+		rec := httptest.NewRecorder()
 
-	rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
 
-	c := e.NewContext(req, rec)
+		mockRepoFace.On("InsertOne", faceData).Return(nil)
 
-	// Assertions
-	errHandler := h.Register(c).(*echo.HTTPError)
-	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
+		// Assertions
+		if assert.NoError(t, h.Register(c)) {
+			assert.Equal(t, http.StatusCreated, rec.Code)
+		}
+	})
+
 }
 
 func TestHandler_RegisterPatch(t *testing.T) {
-	facerec, err := reco.RecognizeFile("../test_happy.jpg")
-	assert.NoError(t, err)
-	faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
+	t.Run("Validation Error",func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPut, "/api/face/register", nil)
 
-	// formfile
-	body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
-	assert.NoError(t, err)
-	// end formfile
-
-	req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
-	req.Form = url.Values{} // set field,value of form
-	req.Form.Set("id", faceData.Id)
-	req.Form.Set("name", faceData.Name)
-
-	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
-
-	rec := httptest.NewRecorder()
-
-	c := e.NewContext(req, rec)
-
-	repo := new(mymock.MockRepoFace)
-
-	h.DBRepo = &database.DBRepo{
-		RepoFace: repo,
-	}
-
-	t.Run("RegisterPatch Happy", func(t *testing.T) {
-		repo.On("FindById", faceData.Id).Return([]models.Face{faceData}, nil).Once()
-		repo.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(nil).Once()
-		if assert.NoError(t, h.RegisterPatch(c)) {
-			assert.Equal(t, http.StatusOK, rec.Code)
-		}
-	})
-	t.Run("RegisterPatch PushErr", func(t *testing.T) {
-		repo.On("FindById", faceData.Id).Return([]models.Face{faceData}, nil).Once()
-		repo.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(errors.New("PushErr")).Once()
-
-		errHandler := h.RegisterPatch(c).(*echo.HTTPError)
-		assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
-	})
-	t.Run("RegisterPatch NotFound", func(t *testing.T) {
-		repo.On("FindById", faceData.Id).Return([]models.Face{}, nil).Once()
-		repo.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(nil).Once()
-
+		rec := httptest.NewRecorder()
+	
+		c := e.NewContext(req, rec)
+	
 		// Assertions
 		errHandler := h.RegisterPatch(c).(*echo.HTTPError)
-		assert.Equal(t, http.StatusNotFound, errHandler.Code)
+		assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 	})
 
-}
+	t.Run("Happy File",func(t *testing.T) {
 
-func TestHandler_RegisterPatch_ValidationErr(t *testing.T) {
-	req := httptest.NewRequest(http.MethodPut, "/api/face/register", nil)
+		facerec, err := reco.RecognizeFile("../test_happy.jpg")
+		assert.NoError(t, err)
+		faceData.Descriptors = []face.Descriptor{facerec[0].Descriptor} // set descriptor
+	
+		// formfile
+		body, writer, err := helper.CreateFormData("file", "../test_happy.jpg")
+		assert.NoError(t, err)
+		// end formfile
+	
+		req := httptest.NewRequest(http.MethodPut, "/api/face/register", body)
+		req.Form = url.Values{} // set field,value of form
+		req.Form.Set("id", faceData.Id)
+		req.Form.Set("name", faceData.Name)
+	
+		req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
+	
+		rec := httptest.NewRecorder()
+	
+		c := e.NewContext(req, rec)
+	
+	
+		t.Run("Happy", func(t *testing.T) {
+			mockRepoFace.On("FindById", faceData.Id).Return([]models.Face{faceData}, nil).Once()
+			mockRepoFace.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(nil).Once()
+			if assert.NoError(t, h.RegisterPatch(c)) {
+				assert.Equal(t, http.StatusOK, rec.Code)
+			}
+		})
+		t.Run("PushErr", func(t *testing.T) {
+			mockRepoFace.On("FindById", faceData.Id).Return([]models.Face{faceData}, nil).Once()
+			mockRepoFace.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(errors.New("PushErr")).Once()
+	
+			errHandler := h.RegisterPatch(c).(*echo.HTTPError)
+			assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
+		})
+		t.Run("NotFound", func(t *testing.T) {
+			mockRepoFace.On("FindById", faceData.Id).Return([]models.Face{}, nil).Once()
+			mockRepoFace.On("PushDescriptor", faceData.Id, faceData.Descriptors[0]).Return(nil).Once()
+	
+			// Assertions
+			errHandler := h.RegisterPatch(c).(*echo.HTTPError)
+			assert.Equal(t, http.StatusNotFound, errHandler.Code)
+		})
+	})
+	
 
-	rec := httptest.NewRecorder()
-
-	c := e.NewContext(req, rec)
-
-	// Assertions
-	errHandler := h.RegisterPatch(c).(*echo.HTTPError)
-	assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 }
