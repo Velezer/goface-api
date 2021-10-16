@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (h Handler) JWTLogin(c echo.Context) error {
+func (h Handler) JWTLogin(c echo.Context) error { // func get token
 	adminData := models.Admin{}
 	err := c.Bind(&adminData)
 	if err != nil {
@@ -51,7 +51,7 @@ func (h Handler) JWTLogin(c echo.Context) error {
 	})
 }
 
-func (h Handler) JWTRegister(c echo.Context) error {
+func (h Handler) JWTRegister(c echo.Context) error { // registering admin
 	adminData := models.Admin{}
 	err := c.Bind(&adminData)
 	if err != nil {
