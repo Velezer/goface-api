@@ -27,12 +27,12 @@ func (h Handler) JWTLogin(c echo.Context) error { // func get token
 	}
 
 	repo := h.DBRepo.RepoAdmin
-	res, err := repo.FindOneByID(adminData.Username) // username equal _id
+	res, err := repo.FindOneByID(adminData.Username) // username equal _id in db
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(adminData.Password))
+	err = h.Bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(adminData.Password))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

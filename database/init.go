@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"goface-api/config"
 	"goface-api/iface"
 	"goface-api/models"
 	"time"
@@ -17,13 +16,11 @@ type DBRepo struct {
 	RepoFace  iface.RepositoryFaceIface
 }
 
-func InitDB() (*DBRepo, error) {
-	conf := config.GetDBConfig()
-
+func InitDB(uri string, dbname string) (*DBRepo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(conf.DB_URI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +30,7 @@ func InitDB() (*DBRepo, error) {
 		return nil, err
 	}
 
-	db := client.Database(conf.DB_NAME)
+	db := client.Database(dbname)
 	dbrepo := DBRepo{
 		RepoAdmin: models.RepoAdmin{Collection: db.Collection("coll_admin")},
 		RepoFace:  models.RepoFace{Collection: db.Collection("coll_face")},

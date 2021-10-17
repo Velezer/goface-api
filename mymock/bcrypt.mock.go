@@ -15,5 +15,10 @@ func (b MockBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, err
 
 	return args.Get(0).([]byte), args.Error(1) // type cast
 }
+func (b MockBcrypt) CompareHashAndPassword(hashedPassword []byte, password []byte) error {
+	args := b.Called(hashedPassword, password)
+
+	return args.Error(0)
+}
 
 // ------end mock bcrypt----------

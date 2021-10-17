@@ -25,7 +25,7 @@ func TestHandler_Find(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, errHandler.Code)
 	})
 
-	t.Run("No Face", func(t *testing.T) {
+	t.Run("PNG file", func(t *testing.T) {
 		body, writer, err := helper.CreateFormData("file", "../test_noface.png")
 		assert.NoError(t, err)
 
@@ -34,7 +34,7 @@ func TestHandler_Find(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		t.Run("FindAllErr", func(t *testing.T) {
+		t.Run("PNG is not supported", func(t *testing.T) {
 			errHandler := h.Find(c).(*echo.HTTPError)
 			assert.Equal(t, http.StatusInternalServerError, errHandler.Code)
 		})

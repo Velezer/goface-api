@@ -1,6 +1,7 @@
 package main
 
 import (
+	"goface-api/config"
 	"goface-api/database"
 	"goface-api/handler"
 	"goface-api/helper"
@@ -16,9 +17,10 @@ import (
 
 func main() {
 	// setup
-	dbrepo, err := database.InitDB()
+	conf := config.GetDBConfig()
+	dbrepo, err := database.InitDB(conf.DB_URI, conf.DB_NAME)
 	if err != nil {
-		log.Fatalf("Can't init databse: %v", err)
+		log.Fatalf("Can't init database: %v", err)
 	}
 	if dbrepo == nil {
 		log.Fatalln("dbrepo is nil")

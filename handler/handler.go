@@ -46,5 +46,8 @@ type RealBcrypt struct {
 func (b RealBcrypt) GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 	return bcrypt.GenerateFromPassword(password, cost)
 }
+func (b RealBcrypt) CompareHashAndPassword(hashedPassword []byte, password []byte) error {
+	return bcrypt.CompareHashAndPassword(hashedPassword, password)
+}
 
 // ------end real bcrypt----------
