@@ -1,22 +1,33 @@
+# Deploying
+
+This API deployed on heroku
+click the [link](`https://goface-api-echo.herokuapp.com/`)
+
 # API SPEC
 
 ## Auth
-Some API has auth with jwt-token 
+
+Some API has auth with jwt-token
 
 Request:
+
 - Header:
-    - Authorization: "Bearer your_jwt_token"
+  - Authorization: "Bearer your_jwt_token"
 
 ## Admin Account
+
 ### JWT Register
+
 Request:
+
 - Method: POST
 - Endpoint: `/jwt/register`
 - Header:
-    - Content-Type: application/json
-    - Accept: application/json
+  - Content-Type: application/json
+  - Accept: application/json
 - Body:
-```json 
+
+```json
 {
     "username" : "string",
     "password" : "string"
@@ -25,20 +36,23 @@ Request:
 
 Response :
 
-```json 
+```json
 {
     "detail" : "string"
 }
 ```
 
 ### JWT Login
+
 Request:
+
 - Method: POST
 - Endpoint: `/jwt/login`
-    - Content-Type: application/json
-    - Accept: application/json
+  - Content-Type: application/json
+  - Accept: application/json
 - Body:
-```json 
+
+```json
 {
     "username" : "string",
     "password" : "string"
@@ -46,22 +60,27 @@ Request:
 ```
 
 Response :
-```json 
+
+```json
 {
     "token" : "string"
 }
 ```
 
 ## Face Data
+
 ### Get Face Data
-Request: 
+
+Request:
+
 - Method: GET
 - Endpoint: `api/face`
-- Header: 
-    - Accept: application/json
-    - Authorization: "Bearer your_jwt_token"
+- Header:
+  - Accept: application/json
+  - Authorization: "Bearer your_jwt_token"
 
 Response:
+
 ```json
 {
     "data": [
@@ -74,15 +93,19 @@ Response:
     
 }
 ```
+
 ### Get Face Data By Id
-Request: 
+
+Request:
+
 - Method: GET
 - Endpoint: `api/face/:id`
-- Header: 
-    - Accept: application/json
-    - Authorization: "Bearer your_jwt_token"
+- Header:
+  - Accept: application/json
+  - Authorization: "Bearer your_jwt_token"
 
 Response:
+
 ```json
 {
     "data": {
@@ -93,15 +116,19 @@ Response:
     
 }
 ```
+
 ### Delete Face Data
-Request: 
+
+Request:
+
 - Method: DELETE
 - Endpoint: `api/face/:id`
-- Header: 
-    - Accept: application/json
-    - Authorization: "Bearer your_jwt_token"
-    
+- Header:
+  - Accept: application/json
+  - Authorization: "Bearer your_jwt_token"
+
 Response:
+
 ```json
 {
     "detail" : "string"
