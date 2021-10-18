@@ -73,6 +73,7 @@ Response:
     ]
     
 }
+```
 ### Get Face Data By Id
 Request: 
 - Method: GET
@@ -91,6 +92,7 @@ Response:
         }
     
 }
+```
 ### Delete Face Data
 Request: 
 - Method: DELETE
