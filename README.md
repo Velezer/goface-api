@@ -58,7 +58,6 @@ Request:
 - Method: GET
 - Endpoint: `api/face`
 - Header: 
-    - Content-Type: application/json
     - Accept: application/json
 
 Response:
@@ -72,5 +71,34 @@ Response:
         }
     ]
     
+}
+### Get Face Data By Id
+Request: 
+- Method: GET
+- Endpoint: `api/face/:id`
+- Header: 
+    - Accept: application/json
+
+Response:
+```json
+{
+    "data": {
+            "id" : "string",
+            "name" : "string",
+            "descriptors" : "int"
+        }
+    
+}
+### Delete Face Data
+Request: 
+- Method: DELETE
+- Endpoint: `api/face/:id`
+- Header: 
+    - Accept: application/json
+
+Response:
+```json
+{
+    "detail" : "string"
 }
 ```
