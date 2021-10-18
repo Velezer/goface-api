@@ -1,7 +1,7 @@
 # Deploying
 
 This API deployed on heroku
-click the [link](`https://goface-api-echo.herokuapp.com/`)
+click the [link](https://goface-api-echo.herokuapp.com/)
 
 # API SPEC
 
