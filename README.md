@@ -12,6 +12,7 @@ Request:
 Request:
 - Method: POST
 - Endpoint: `/jwt/register`
+- Header:
     - Content-Type: application/json
     - Accept: application/json
 - Body:
@@ -19,6 +20,14 @@ Request:
 {
     "username" : "string",
     "password" : "string"
+}
+```
+
+Response :
+
+```json 
+{
+    "detail" : "string"
 }
 ```
 
@@ -36,3 +45,32 @@ Request:
 }
 ```
 
+Response :
+```json 
+{
+    "token" : "string"
+}
+```
+
+## Face Data
+### Get Face Data
+Request: 
+- Method: GET
+- Endpoint: `api/face`
+- Header: 
+    - Content-Type: application/json
+    - Accept: application/json
+
+Response:
+```json
+{
+    "data": [
+        {
+            "id" : "string",
+            "name" : "string",
+            "descriptors" : "int"
+        }
+    ]
+    
+}
+```
