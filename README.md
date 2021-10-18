@@ -59,7 +59,7 @@ Request:
 - Endpoint: `api/face`
 - Header: 
     - Accept: application/json
-
+    - Authorization: "Bearer your_jwt_token"
 Response:
 ```json
 {
@@ -78,7 +78,7 @@ Request:
 - Endpoint: `api/face/:id`
 - Header: 
     - Accept: application/json
-
+    - Authorization: "Bearer your_jwt_token"
 Response:
 ```json
 {
@@ -95,7 +95,7 @@ Request:
 - Endpoint: `api/face/:id`
 - Header: 
     - Accept: application/json
-
+    - Authorization: "Bearer your_jwt_token"
 Response:
 ```json
 {
