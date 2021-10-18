@@ -174,6 +174,7 @@ Response:
     ]
 }
 ```
+
 ### Register Face
 
 Request:
@@ -209,6 +210,8 @@ Response:
       }
     
 }
+```
+
 ### Add Face
 
 Request:
