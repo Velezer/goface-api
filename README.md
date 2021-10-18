@@ -3,6 +3,9 @@
 This API deployed on heroku
 click the [link](https://goface-api-echo.herokuapp.com/)
 
+Attention!
+Due to [go-face](https://github.com/Kagami/go-face) dependency, it's only support jpg image
+
 # API SPEC
 
 ## Auth
@@ -151,9 +154,9 @@ Request:
 - Body:
 
 ```form-data
-{
-    "file" : "File",
-}
+
+"file" : "image/jpeg"
+
 ```
 
 Response:
