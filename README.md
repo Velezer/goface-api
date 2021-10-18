@@ -60,6 +60,7 @@ Request:
 - Header: 
     - Accept: application/json
     - Authorization: "Bearer your_jwt_token"
+
 Response:
 ```json
 {
@@ -79,6 +80,7 @@ Request:
 - Header: 
     - Accept: application/json
     - Authorization: "Bearer your_jwt_token"
+
 Response:
 ```json
 {
