@@ -174,3 +174,74 @@ Response:
     ]
 }
 ```
+### Register Face
+
+Request:
+
+- Method: POST
+- Endpoint: `api/face/register`
+- Header:
+  - Content-Type: multipart/form-data
+  - Accept: application/json
+  - Authorization: "Bearer your_jwt_token"
+
+- Body:
+
+```form-data
+"id" : "string",
+"name" : "string",
+"file" : "image/jpeg"
+
+```
+
+Response:
+
+```json
+{
+    "detail" : "string",
+    "data" : 
+      {
+        "id" : "string",
+        "name" : "string",
+        "descriptors" : [
+          "[128]float32"
+        ]
+      }
+    
+}
+### Add Face
+
+Request:
+
+- Method: PUT
+- Endpoint: `api/face/register`
+- Header:
+  - Content-Type: multipart/form-data
+  - Accept: application/json
+  - Authorization: "Bearer your_jwt_token"
+
+- Body:
+
+```form-data
+"id" : "string",
+"name" : "string",
+"file" : "image/jpeg"
+
+```
+
+Response:
+
+```json
+{
+    "detail" : "string",
+    "data" : 
+      {
+        "id" : "string",
+        "name" : "string",
+        "descriptors" : [
+          "[128]float32"
+        ]
+      }
+    
+}
+```
