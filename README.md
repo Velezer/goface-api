@@ -7,7 +7,7 @@ click the [link](https://goface-api-echo.herokuapp.com/)
 
 ## Auth
 
-Some API has auth with jwt-token
+Some endpoints has auth with jwt-token
 
 Request:
 
@@ -132,5 +132,42 @@ Response:
 ```json
 {
     "detail" : "string"
+}
+```
+
+## Face Action
+
+### Find Face
+
+Request:
+
+- Method: POST
+- Endpoint: `api/face/find`
+- Header:
+  - Content-Type: multipart/form-data
+  - Accept: application/json
+  - Authorization: "Bearer your_jwt_token"
+
+- Body:
+
+```form-data
+{
+    "file" : "File",
+}
+```
+
+Response:
+
+```json
+{
+    "detail" : "string",
+    "response_time" : "string",
+    "data" : [
+      {
+        "id" : "string",
+        "name" : "string",
+        "distance" : "float64"
+      }
+    ]
 }
 ```
